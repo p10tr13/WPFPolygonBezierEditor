@@ -7,6 +7,6 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="700" Width="1000" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Grid>
-        <Canvas x:Name="Canva" Background="White" Height="700" Width="1000" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="Canvas_MouseMove"/>
+        <Canvas x:Name="Canva" Background="White" Height="700" Width="1000" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="Canvas_MouseMove" MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
     </Grid>
 </Window>
