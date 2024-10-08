@@ -28,7 +28,7 @@ namespace GK_Proj_1
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
             Point pt = e.GetPosition(Canva);
-            if (drawing && drawingFigure.Edges.Count != 0 && (Math.Abs(pt.X - drawingAnimationEdge.p2.X) > 2 || Math.Abs(pt.Y - drawingAnimationEdge.p2.Y) > 2))
+            if (drawing && drawingFigure.Edges.Count != 0 && (drawingAnimationEdge.p2 - pt).Length > 2)
             {
                 drawingAnimationEdge.p2 = e.GetPosition(Canva);
                 Redraw();
@@ -49,7 +49,19 @@ namespace GK_Proj_1
             }
             if (drawing)
             {
-                drawingFigure.Edges.Add(new Edge(drawingAnimationEdge.p1, pt));
+                if(drawingFigure.IsNearVert(pt,out int ind))
+                {
+                    if (ind == 0 && drawingFigure.Edges.Count >= 3)
+                    {
+                        drawingFigure.Edges[drawingFigure.Edges.Count - 1] = new Edge(drawingAnimationEdge.p1,drawingFigure.Edges[0].p1);
+                        drawing = false;
+                        Redraw();
+                    }
+                    return;
+                }
+                Edge ed = new Edge(drawingAnimationEdge.p1, pt);
+                drawingFigure.Edges[drawingFigure.Edges.Count - 1] = ed;
+                drawingFigure.Edges.Add(drawingAnimationEdge);
                 drawingAnimationEdge.p1 = pt;
                 Redraw();
                 return;
@@ -95,6 +107,21 @@ namespace GK_Proj_1
                 edge.Draw(dc);
             }
         }
+
+        //Sprawdzamy czy dany punkt jest blisko któregoś wierzchołka (numeracja po pierwszych wierzchołkach listy krawędzi)
+        public bool IsNearVert(Point pt, out int ind)
+        {
+            for(int i = 0; i < Edges.Count; i++)
+            {
+                if (Edges[i].IsNearP1Vert(pt))
+                {
+                    ind = i;
+                    return true;
+                }
+            }
+            ind = -1;
+            return false;
+        }
     }
 
     public class Edge
@@ -112,6 +139,25 @@ namespace GK_Proj_1
         {
             Pen pen = new Pen(Brushes.CadetBlue, 3);
             dc.DrawLine(pen, p1, p2);
+            dc.DrawEllipse(Brushes.Purple, null, p1, 4, 4);
+        }
+
+        public bool IsNearP1Vert(Point pt)
+        {
+            if((p1-pt).Length < 10)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool IsNearP2Vert(Point pt)
+        {
+            if ((p2 - pt).Length < 10)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
