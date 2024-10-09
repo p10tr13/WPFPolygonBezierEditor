@@ -35,6 +35,7 @@ namespace GK_Proj_1
         private bool draggingFigure = false;
         private bool draggingVert = false;
         private bool draggingEdge = false;
+        private Point addVertPoint = new Point(0, 0);
         private Point lastMousePosition = new Point(0, 0);
 
         private void InitializeVertContextMenu()
@@ -48,8 +49,9 @@ namespace GK_Proj_1
         private void InitializeEdgeContextMenu()
         {
             edgeContextMenu = new ContextMenu();
-            MenuItem opt1MenuItem = new MenuItem { Header = "opt1" };
-            edgeContextMenu.Items.Add(opt1MenuItem);
+            MenuItem addVertMenuItem = new MenuItem { Header = "Add vertex" };
+            edgeContextMenu.Items.Add(addVertMenuItem);
+            addVertMenuItem.Click += AddVertexItemClick;
         }
 
         private void DeleteMenuItemClick(object sender, RoutedEventArgs e)
@@ -73,6 +75,15 @@ namespace GK_Proj_1
             drawingFigure.Edges.RemoveAt(selectedVert);
             Redraw();
             return;
+        }
+
+        private void AddVertexItemClick(object sender, RoutedEventArgs e)
+        {
+            Point middle = drawingFigure.Edges[selectedEdge].ClosestPointOnEdge(addVertPoint);
+            Edge ed = new Edge(middle, drawingFigure.Edges[selectedEdge].p2);
+            drawingFigure.Edges[selectedEdge].p2 = middle;
+            drawingFigure.AddEdgeAt(selectedEdge + 1, ed);
+            Redraw();
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
@@ -179,6 +190,7 @@ namespace GK_Proj_1
             }
             if (drawingFigure.IsNearEdge(pt, out int edgind))
             {
+                addVertPoint = pt;
                 selectedEdge = edgind;
                 edgeContextMenu.PlacementTarget = Canva;
                 edgeContextMenu.IsOpen = true;
@@ -224,6 +236,11 @@ namespace GK_Proj_1
             Edges.Add(edge);
         }
 
+        public void AddEdgeAt(int ind, Edge edge)
+        {
+            Edges.Insert(ind, edge);
+        }
+
         public void Draw(DrawingContext dc)
         {
             foreach (Edge edge in Edges)
@@ -263,7 +280,7 @@ namespace GK_Proj_1
         }
 
         //Sprawdzamy czy punkt jest w środku wielokąta
-        public bool IsPointInside(Point pt)
+        public bool IsPointInside(Point pt) 
         {
             double x = pt.X, y = pt.Y;
             bool inside = false;
@@ -445,18 +462,24 @@ namespace GK_Proj_1
             return false;
         }
 
-        public bool IsNearEdge(Point pt)
+        public Point ClosestPointOnEdge(Point pt)
         {
             double LLS = Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2);
             if (LLS == 0.0)
-                return false;
+                return new Point(-1,-1);
             double t = ((pt.X - p1.X) * (p2.X - p1.X) + (pt.Y - p1.Y) * (p2.Y - p1.Y)) / LLS;
             t = Math.Max(0, Math.Min(1, t));
             double closeX = p1.X + t * (p2.X - p1.X);
             double closeY = p1.Y + t * (p2.Y - p1.Y);
-            double dist = Math.Sqrt(Math.Pow(pt.X - closeX, 2) + Math.Pow(pt.Y - closeY, 2));
+            return new Point(closeX, closeY);
+        }
 
-            return dist < 10;
+        public bool IsNearEdge(Point pt)
+        {
+            Point closestpt = ClosestPointOnEdge(pt);
+            if(closestpt.X == -1 && closestpt.Y == -1)
+                return false;
+            return (closestpt - pt).Length < 10;
         }
     }
 }
