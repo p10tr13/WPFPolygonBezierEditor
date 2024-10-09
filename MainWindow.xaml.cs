@@ -52,6 +52,11 @@ namespace GK_Proj_1
             MenuItem addVertMenuItem = new MenuItem { Header = "Add vertex" };
             edgeContextMenu.Items.Add(addVertMenuItem);
             addVertMenuItem.Click += AddVertexItemClick;
+            MenuItem horEdgeMenuItem = new MenuItem { Header = "Change type to horizontal" };
+            edgeContextMenu.Items.Add(horEdgeMenuItem);
+            horEdgeMenuItem.Click += HorEdgeItemClick;
+            MenuItem vertEdgeMenuItem = new MenuItem { Header = "Change type to vertical" };
+            edgeContextMenu.Items.Add(vertEdgeMenuItem);
         }
 
         private void DeleteMenuItemClick(object sender, RoutedEventArgs e)
@@ -83,6 +88,15 @@ namespace GK_Proj_1
             Edge ed = new Edge(middle, drawingFigure.Edges[selectedEdge].p2);
             drawingFigure.Edges[selectedEdge].p2 = middle;
             drawingFigure.AddEdgeAt(selectedEdge + 1, ed);
+            Redraw();
+        }
+
+        private void HorEdgeItemClick(object sender, RoutedEventArgs e)
+        {
+            Edge ed = drawingFigure.Edges[selectedEdge];
+            HorizontalEdge hed = new HorizontalEdge(ed.p1,ed.p2);
+            drawingFigure.Edges.RemoveAt(selectedEdge);
+            drawingFigure.AddEdgeAt(selectedEdge, hed);
             Redraw();
         }
 
@@ -480,6 +494,61 @@ namespace GK_Proj_1
             if(closestpt.X == -1 && closestpt.Y == -1)
                 return false;
             return (closestpt - pt).Length < 10;
+        }
+
+        public virtual (double x, double y) MoveP1To(Point pt)
+        {
+            p1 = pt;
+            return (0, 0);
+        }
+
+        public virtual (double x, double y) MoveP2To(Point pt)
+        {
+            p2 = pt;
+            return (0, 0);
+        }
+    }
+
+    public class HorizontalEdge : Edge
+    {
+        public HorizontalEdge(Point p1, Point p2): base(p1, new Point(p2.X, p1.Y)) {}
+
+        public override (double x, double y) MoveP1To(Point pt)
+        {
+            double y = pt.Y - p1.Y;
+            p1 = pt;
+            p2.Y = pt.Y;
+            return (0,y);
+        }
+
+        public override (double x, double y) MoveP2To(Point pt)
+        {
+            double y = pt.Y - p2.Y;
+            p2 = pt;
+            p1.Y = pt.Y;
+            return (0, y);
+        }
+    }
+
+    public class VerticalEdge : Edge
+    {
+
+        public VerticalEdge(Point p1, Point p2) : base(p1, new Point(p1.X, p2.Y)) {}
+
+        public override (double x, double y) MoveP1To(Point pt)
+        {
+            double x = pt.X - p1.X;
+            p1 = pt;
+            p2.X = pt.X;
+            return (x, 0);
+        }
+
+        public override (double x, double y) MoveP2To(Point pt)
+        {
+            double x = pt.X - p2.X;
+            p2 = pt;
+            p1.X = pt.X;
+            return (x, 0);
         }
     }
 }
