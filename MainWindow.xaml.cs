@@ -20,10 +20,10 @@ namespace GK_Proj_1
         {
             InitializeComponent();
             InitializeVertContextMenu();
+            InitializeEdgeContextMenu();
         }
 
-
-        private ContextMenu vertContexMenu;
+        private ContextMenu vertContextMenu, edgeContextMenu;
         private bool drawing = false;
         private Figure drawingFigure = new Figure();
         private Edge drawingAnimationEdge = null;
@@ -32,15 +32,40 @@ namespace GK_Proj_1
 
         private void InitializeVertContextMenu()
         {
-            vertContexMenu = new ContextMenu();
+            vertContextMenu = new ContextMenu();
             MenuItem deleteMenuItem = new MenuItem { Header = "정점을 제거" };
             deleteMenuItem.Click += DeleteMenuItemClick;
-            vertContexMenu.Items.Add(deleteMenuItem);
+            vertContextMenu.Items.Add(deleteMenuItem);
+        }
+
+        private void InitializeEdgeContextMenu()
+        {
+            edgeContextMenu = new ContextMenu();
+            MenuItem opt1MenuItem = new MenuItem { Header = "opt1" };
+            edgeContextMenu.Items.Add(opt1MenuItem);
         }
 
         private void DeleteMenuItemClick(object sender, RoutedEventArgs e)
         {
+            if(drawingFigure.Edges.Count == 3)
+            {
+                drawingFigure.Edges.Clear();
+                Redraw();
+                return;
+            }
 
+            if(0 == selectedVert)
+            {
+                drawingFigure.Edges[drawingFigure.Edges.Count - 1].p2 = drawingFigure.Edges[0].p2;
+                drawingFigure.Edges.RemoveAt(0);
+                Redraw();
+                return;
+            }
+
+            drawingFigure.Edges[selectedVert - 1].p2 = drawingFigure.Edges[selectedVert].p2;
+            drawingFigure.Edges.RemoveAt(selectedVert);
+            Redraw();
+            return;
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
@@ -91,11 +116,19 @@ namespace GK_Proj_1
             Point pt = e.GetPosition(this);
             if (drawing || drawingFigure.Edges.Count < 2)
                 return;
-            if (drawingFigure.IsNearVert(pt, out int ind))
+            if (drawingFigure.IsNearVert(pt, out int vertind))
             {
-                selectedVert = ind;
-                vertContexMenu.PlacementTarget = Canva;
-                vertContexMenu.IsOpen = true;
+                selectedVert = vertind;
+                vertContextMenu.PlacementTarget = Canva;
+                vertContextMenu.IsOpen = true;
+                return;
+            }
+            if(drawingFigure.IsNearEdge(pt, out int edgind))
+            {
+                selectedEdge = edgind;
+                edgeContextMenu.PlacementTarget = Canva;
+                edgeContextMenu.IsOpen = true;
+                return;
             }
         }
 
@@ -119,7 +152,6 @@ namespace GK_Proj_1
     public class Figure
     {
         public List<Edge> Edges { get; set; }
-        public bool IsSealed { get; set; }
 
         public Figure()
         {
@@ -145,6 +177,21 @@ namespace GK_Proj_1
             for (int i = 0; i < Edges.Count; i++)
             {
                 if (Edges[i].IsNearP1Vert(pt))
+                {
+                    ind = i;
+                    return true;
+                }
+            }
+            ind = -1;
+            return false;
+        }
+
+        //Sprawdzamy czy dany punkt jest blisko którejś krawędzi
+        public bool IsNearEdge(Point pt, out int ind)
+        {
+            for(int i =0; i < Edges.Count; i++)
+            {
+                if (Edges[i].IsNearEdge(pt))
                 {
                     ind = i;
                     return true;
