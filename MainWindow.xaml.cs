@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -8,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Point = System.Windows.Point;
 
 namespace GK_Proj_1
 {
@@ -29,6 +32,10 @@ namespace GK_Proj_1
         private Edge drawingAnimationEdge = null;
         private int selectedVert = -1;
         private int selectedEdge = -1;
+        private bool draggingFigure = false;
+        private bool draggingVert = false;
+        private bool draggingEdge = false;
+        private Point lastMousePosition = new Point(0, 0);
 
         private void InitializeVertContextMenu()
         {
@@ -47,14 +54,14 @@ namespace GK_Proj_1
 
         private void DeleteMenuItemClick(object sender, RoutedEventArgs e)
         {
-            if(drawingFigure.Edges.Count == 3)
+            if (drawingFigure.Edges.Count == 3)
             {
                 drawingFigure.Edges.Clear();
                 Redraw();
                 return;
             }
 
-            if(0 == selectedVert)
+            if (0 == selectedVert)
             {
                 drawingFigure.Edges[drawingFigure.Edges.Count - 1].p2 = drawingFigure.Edges[0].p2;
                 drawingFigure.Edges.RemoveAt(0);
@@ -75,7 +82,32 @@ namespace GK_Proj_1
             {
                 drawingAnimationEdge.p2 = e.GetPosition(Canva);
                 Redraw();
+                return;
             }
+
+            if (draggingVert && (lastMousePosition - pt).Length > 2)
+            {
+                drawingFigure.MoveVert(pt.X - lastMousePosition.X, pt.Y - lastMousePosition.Y, selectedVert);
+                Redraw();
+                lastMousePosition = pt;
+                return;
+            }
+
+            if (draggingEdge && (lastMousePosition - pt).Length > 2)
+            {
+                drawingFigure.MoveEdge(pt.X - lastMousePosition.X, pt.Y - lastMousePosition.Y, selectedEdge);
+                Redraw();
+                lastMousePosition = pt;
+                return;
+            }
+
+            if (draggingFigure && (lastMousePosition - pt).Length > 2)
+            {
+                drawingFigure.SimpleMove(pt.X - lastMousePosition.X, pt.Y - lastMousePosition.Y);
+                Redraw();
+                lastMousePosition = pt;
+            }
+
         }
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -109,6 +141,28 @@ namespace GK_Proj_1
                 Redraw();
                 return;
             }
+
+            if (drawingFigure.IsNearVert(pt, out int vertind))
+            {
+                selectedVert = vertind;
+                draggingVert = true;
+                lastMousePosition = pt;
+                return;
+            }
+
+            if(drawingFigure.IsNearEdge(pt, out int edgeind))
+            {
+                selectedEdge = edgeind;
+                draggingEdge = true;
+                lastMousePosition = pt;
+                return;
+            }
+
+            if (drawingFigure.IsPointInside(pt))
+            {
+                lastMousePosition = pt;
+                draggingFigure = true;
+            }
         }
 
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -123,13 +177,20 @@ namespace GK_Proj_1
                 vertContextMenu.IsOpen = true;
                 return;
             }
-            if(drawingFigure.IsNearEdge(pt, out int edgind))
+            if (drawingFigure.IsNearEdge(pt, out int edgind))
             {
                 selectedEdge = edgind;
                 edgeContextMenu.PlacementTarget = Canva;
                 edgeContextMenu.IsOpen = true;
                 return;
             }
+        }
+
+        private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            draggingFigure = false;
+            draggingVert = false;
+            draggingEdge = false;
         }
 
         private void Redraw()
@@ -189,7 +250,7 @@ namespace GK_Proj_1
         //Sprawdzamy czy dany punkt jest blisko którejś krawędzi
         public bool IsNearEdge(Point pt, out int ind)
         {
-            for(int i =0; i < Edges.Count; i++)
+            for (int i = 0; i < Edges.Count; i++)
             {
                 if (Edges[i].IsNearEdge(pt))
                 {
@@ -199,6 +260,152 @@ namespace GK_Proj_1
             }
             ind = -1;
             return false;
+        }
+
+        //Sprawdzamy czy punkt jest w środku wielokąta
+        public bool IsPointInside(Point pt)
+        {
+            double x = pt.X, y = pt.Y;
+            bool inside = false;
+
+            Point p1 = Edges[0].p1, p2;
+
+            for (int i = 1; i <= Edges.Count; i++)
+            {
+                // Get the next point in the polygon
+                p2 = Edges[i % Edges.Count].p1;
+
+                // Check if the point is above the minimum y coordinate of the edge
+                if (y > Math.Min(p1.Y, p2.Y))
+                {
+                    // Check if the point is below the maximum y coordinate of the edge
+                    if (y <= Math.Max(p1.Y, p2.Y))
+                    {
+                        // Check if the point is to the left of the maximum x coordinate of the edge
+                        if (x <= Math.Max(p1.X, p2.X))
+                        {
+                            // Calculate the x-intersection of the line connecting the point to the edge
+                            double xIntersection = (y - p1.Y) * (p2.X - p1.X) / (p2.Y - p1.Y) + p1.X;
+
+                            // Check if the point is on the same line as the edge or to the left of the x-intersection
+                            if (p1.X == p2.X || x <= xIntersection)
+                            {
+                                inside = !inside;
+                            }
+                        }
+                    }
+                }
+                p1 = p2;
+            }
+            return inside;
+        }
+
+        public int Move(double x, double y, double maxX, double maxY)
+        {
+            int res = 0;
+            bool canX = true, canY = true;
+            foreach (Edge ed in Edges)
+            {
+                if (ed.p1.X + x > maxX || ed.p1.X + x < 0)
+                    canX = false;
+                if (ed.p1.Y + y > maxY || ed.p2.Y + y < 0)
+                    canY = false;
+                if (!canY && !canX)
+                    return res;
+            }
+
+            if (canX)
+            {
+                MoveX(x);
+                res++;
+            }
+
+            if (canY)
+            {
+                MoveY(y);
+                res += 2;
+            }
+
+            return res;
+        }
+
+        public void SimpleMove(double x, double y)
+        {
+            MoveX(x);
+            MoveY(y);
+        }
+
+        public void MoveVert(double x, double y, int vertind)
+        {
+            if (vertind == 0)
+            {
+                Edges[0].p1.X += x;
+                Edges[0].p1.Y += y;
+                Edges[Edges.Count - 1].p2.X += x;
+                Edges[Edges.Count - 1].p2.Y += y;
+                return;
+            }
+
+            Edges[vertind].p1.X += x;
+            Edges[vertind].p1.Y += y;
+            Edges[vertind - 1].p2.X += x;
+            Edges[vertind - 1].p2.Y += y;
+        }
+
+        public void MoveEdge(double x, double y, int edgeind)
+        {
+            if (edgeind == 0)
+            {
+                Edges[0].p1.X += x;
+                Edges[0].p1.Y += y;
+                Edges[0].p2.X += x;
+                Edges[0].p2.Y += y;
+                Edges[Edges.Count - 1].p2.X += x;
+                Edges[Edges.Count - 1].p2.Y += y;
+                Edges[1].p1.X += x;
+                Edges[1].p1.Y += y;
+                return;
+            }
+
+            if(edgeind == Edges.Count - 1)
+            {
+                Edges[edgeind].p1.X += x;
+                Edges[edgeind].p1.Y += y;
+                Edges[edgeind].p2.X += x;
+                Edges[edgeind].p2.Y += y;
+                Edges[edgeind - 1].p2.X += x;
+                Edges[edgeind - 1].p2.Y += y;
+                Edges[0].p1.X += x;
+                Edges[0].p1.Y += y;
+                return;
+            }
+
+            Edges[edgeind].p1.X += x;
+            Edges[edgeind].p1.Y += y;
+            Edges[edgeind].p2.X += x;
+            Edges[edgeind].p2.Y += y;
+            Edges[edgeind - 1].p2.X += x;
+            Edges[edgeind - 1].p2.Y += y;
+            Edges[edgeind + 1].p1.X += x;
+            Edges[edgeind + 1].p1.Y += y;
+        }
+
+        public void MoveY(double y)
+        {
+            foreach (Edge ed in Edges)
+            {
+                ed.p1.Y += y;
+                ed.p2.Y += y;
+            }
+        }
+
+        public void MoveX(double x)
+        {
+            foreach (Edge ed in Edges)
+            {
+                ed.p1.X += x;
+                ed.p2.X += x;
+            }
         }
     }
 
@@ -244,10 +451,10 @@ namespace GK_Proj_1
             if (LLS == 0.0)
                 return false;
             double t = ((pt.X - p1.X) * (p2.X - p1.X) + (pt.Y - p1.Y) * (p2.Y - p1.Y)) / LLS;
-            t = Math.Max(0,Math.Min(1,t));
+            t = Math.Max(0, Math.Min(1, t));
             double closeX = p1.X + t * (p2.X - p1.X);
             double closeY = p1.Y + t * (p2.Y - p1.Y);
-            double dist = Math.Sqrt(Math.Pow(pt.X - closeX,2) +  Math.Pow(pt.Y - closeY,2));
+            double dist = Math.Sqrt(Math.Pow(pt.X - closeX, 2) + Math.Pow(pt.Y - closeY, 2));
 
             return dist < 10;
         }
