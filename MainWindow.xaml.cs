@@ -97,6 +97,7 @@ namespace GK_Proj_1
             HorizontalEdge hed = new HorizontalEdge(ed.p1,ed.p2);
             drawingFigure.Edges.RemoveAt(selectedEdge);
             drawingFigure.AddEdgeAt(selectedEdge, hed);
+            drawingFigure.AdjustToVert(hed.p1,selectedEdge);
             Redraw();
         }
 
@@ -112,7 +113,8 @@ namespace GK_Proj_1
 
             if (draggingVert && (lastMousePosition - pt).Length > 2)
             {
-                drawingFigure.MoveVert(pt.X - lastMousePosition.X, pt.Y - lastMousePosition.Y, selectedVert);
+                //drawingFigure.MoveVert(pt.X - lastMousePosition.X, pt.Y - lastMousePosition.Y, selectedVert);
+                drawingFigure.AdjustToVert(pt,selectedVert);
                 Redraw();
                 lastMousePosition = pt;
                 return;
@@ -437,6 +439,41 @@ namespace GK_Proj_1
                 ed.p1.X += x;
                 ed.p2.X += x;
             }
+        }
+
+        public bool AdjustToVert(Point pt, int vertind)
+        {
+            int index = (vertind + 1)%Edges.Count;
+            (double x, double y ) = Edges[vertind].MoveP1To(pt);
+            Point pt1, pt2 = Edges[vertind].p2;
+            while (x != 0 && y != 0)
+            {
+                (x,y) = Edges[index].MoveP1To(pt2);
+                pt2 = Edges[index].p2;
+                index = (++index) % Edges.Count;
+                if (index == vertind)
+                    return false;
+            }
+
+            if (vertind == 0)
+                index = Edges.Count - 1;
+            else
+                index = vertind - 1;
+
+            pt1 = Edges[vertind].p1;
+            (x,y) = Edges[index].MoveP2To(pt1);
+            while (x != 0 && y != 0)
+            {
+                pt1 = Edges[index].p1;
+                index--;
+                if (index == vertind)
+                    return false;
+                if(index == -1)
+                    index = Edges.Count - 1;
+                (x, y) = Edges[index].MoveP2To(pt1);
+            }
+
+            return true;
         }
     }
 
