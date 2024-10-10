@@ -55,8 +55,9 @@ namespace GK_Proj_1
             MenuItem horEdgeMenuItem = new MenuItem { Header = "Change type to horizontal" };
             edgeContextMenu.Items.Add(horEdgeMenuItem);
             horEdgeMenuItem.Click += HorEdgeItemClick;
-            MenuItem vertEdgeMenuItem = new MenuItem { Header = "Change type to vertical" };
-            edgeContextMenu.Items.Add(vertEdgeMenuItem);
+            MenuItem verEdgeMenuItem = new MenuItem { Header = "Change type to vertical" };
+            edgeContextMenu.Items.Add(verEdgeMenuItem);
+            verEdgeMenuItem.Click += VerEdgeItemClick;
         }
 
         private void DeleteMenuItemClick(object sender, RoutedEventArgs e)
@@ -68,16 +69,24 @@ namespace GK_Proj_1
                 return;
             }
 
+            Edge ed = new Edge(new Point(0, 0), drawingFigure.Edges[selectedVert].p2);
+
             if (0 == selectedVert)
             {
-                drawingFigure.Edges[drawingFigure.Edges.Count - 1].p2 = drawingFigure.Edges[0].p2;
                 drawingFigure.Edges.RemoveAt(0);
+                drawingFigure.Edges.Add(ed);
+                ed.p1 = drawingFigure.Edges[drawingFigure.Edges.Count - 2].p1;
+                drawingFigure.Edges.RemoveAt(drawingFigure.Edges.Count - 2);
+                drawingFigure.UpdateRelation(drawingFigure.Edges.Count - 1);
                 Redraw();
                 return;
             }
 
-            drawingFigure.Edges[selectedVert - 1].p2 = drawingFigure.Edges[selectedVert].p2;
             drawingFigure.Edges.RemoveAt(selectedVert);
+            drawingFigure.AddEdgeAt(selectedVert,ed);
+            ed.p1 = drawingFigure.Edges[selectedVert - 1].p1;
+            drawingFigure.Edges.RemoveAt(selectedVert - 1);
+            drawingFigure.UpdateRelation(selectedVert - 1);
             Redraw();
             return;
         }
@@ -86,18 +95,34 @@ namespace GK_Proj_1
         {
             Point middle = drawingFigure.Edges[selectedEdge].ClosestPointOnEdge(addVertPoint);
             Edge ed = new Edge(middle, drawingFigure.Edges[selectedEdge].p2);
-            drawingFigure.Edges[selectedEdge].p2 = middle;
             drawingFigure.AddEdgeAt(selectedEdge + 1, ed);
+            drawingFigure.Edges[selectedEdge].AdjustP2();            
             Redraw();
         }
 
         private void HorEdgeItemClick(object sender, RoutedEventArgs e)
         {
+            if (!drawingFigure.CheckRelationsOfEdge(selectedEdge, RelationType.Horizontal))
+                return;
             Edge ed = drawingFigure.Edges[selectedEdge];
             HorizontalEdge hed = new HorizontalEdge(ed.p1,ed.p2);
             drawingFigure.Edges.RemoveAt(selectedEdge);
             drawingFigure.AddEdgeAt(selectedEdge, hed);
-            drawingFigure.AdjustToVert(hed.p1,selectedEdge);
+            hed.p1Edge.AdjustP2();
+            hed.p2Edge.AdjustP1();
+            Redraw();
+        }
+
+        private void VerEdgeItemClick(object sender, RoutedEventArgs e)
+        {
+            if (!drawingFigure.CheckRelationsOfEdge(selectedEdge, RelationType.Vertical))
+                return;
+            Edge ed = drawingFigure.Edges[selectedEdge];
+            VerticalEdge ved = new VerticalEdge(ed.p1, ed.p2);
+            drawingFigure.Edges.RemoveAt(selectedEdge);
+            drawingFigure.AddEdgeAt(selectedEdge, ved);
+            ved.p1Edge.AdjustP2();
+            ved.p2Edge.AdjustP1();
             Redraw();
         }
 
@@ -114,7 +139,9 @@ namespace GK_Proj_1
             if (draggingVert && (lastMousePosition - pt).Length > 2)
             {
                 //drawingFigure.MoveVert(pt.X - lastMousePosition.X, pt.Y - lastMousePosition.Y, selectedVert);
-                drawingFigure.AdjustToVert(pt,selectedVert);
+                //drawingFigure.AdjustToVert(pt,selectedVert);
+                if (!drawingFigure.TryMoveVert(pt, selectedVert))
+                    return;
                 Redraw();
                 lastMousePosition = pt;
                 return;
@@ -157,6 +184,7 @@ namespace GK_Proj_1
                     {
                         drawingFigure.Edges[drawingFigure.Edges.Count - 1] = new Edge(drawingAnimationEdge.p1, drawingFigure.Edges[0].p1);
                         drawing = false;
+                        drawingFigure.UpdateAllRelations();
                         Redraw();
                     }
                     return;
@@ -255,6 +283,7 @@ namespace GK_Proj_1
         public void AddEdgeAt(int ind, Edge edge)
         {
             Edges.Insert(ind, edge);
+            UpdateRelation(ind);
         }
 
         public void Draw(DrawingContext dc)
@@ -441,44 +470,72 @@ namespace GK_Proj_1
             }
         }
 
-        public bool AdjustToVert(Point pt, int vertind)
+        public void UpdateAllRelations()
         {
-            int index = (vertind + 1)%Edges.Count;
-            (double x, double y ) = Edges[vertind].MoveP1To(pt);
-            Point pt1, pt2 = Edges[vertind].p2;
-            while (x != 0 && y != 0)
+            int p = Edges.Count - 1, n = 1;
+            for (int i = 0; i < Edges.Count; i++)
             {
-                (x,y) = Edges[index].MoveP1To(pt2);
-                pt2 = Edges[index].p2;
-                index = (++index) % Edges.Count;
-                if (index == vertind)
-                    return false;
+                Edges[i].p1Edge = Edges[p];
+                Edges[i].p2Edge = Edges[n];
+                p = (++p) % Edges.Count;
+                n = (++n) % Edges.Count;
             }
+        }
 
-            if (vertind == 0)
-                index = Edges.Count - 1;
-            else
-                index = vertind - 1;
-
-            pt1 = Edges[vertind].p1;
-            (x,y) = Edges[index].MoveP2To(pt1);
-            while (x != 0 && y != 0)
+        public void UpdateRelation(int ind)
+        {
+            Edge edge = Edges[ind];
+            if(ind == Edges.Count - 1)
             {
-                pt1 = Edges[index].p1;
-                index--;
-                if (index == vertind)
-                    return false;
-                if(index == -1)
-                    index = Edges.Count - 1;
-                (x, y) = Edges[index].MoveP2To(pt1);
+                Edges[0].p1Edge = edge;
+                edge.p1Edge = Edges[ind - 1];
+                edge.p2Edge = Edges[0];
+                Edges[ind - 1].p2Edge = edge;
+                return;
             }
+            if(ind == 0)
+            {
+                Edges[Edges.Count - 1].p2Edge = edge;
+                Edges[ind + 1].p1Edge = edge;
+                edge.p1Edge = Edges[Edges.Count - 1];
+                edge.p2Edge = Edges[1];
+                return;
+            }
+            Edges[ind - 1].p2Edge = edge;
+            Edges[ind + 1].p1Edge = edge;
+            edge.p1Edge = Edges[ind - 1];
+            edge.p2Edge = Edges[ind + 1];
+        }
 
-            return true;
+        public bool TryMoveVert(Point pt, int vertind)
+        {
+            return Edges[vertind].MoveP1To(pt);
+        }
+
+        public bool CheckRelationsWithoutEdge(int ind)
+        {
+            if(Edges.Count == 3)
+                return false;
+            int p = ind - 1, n = (ind + 1) % Edges.Count;
+            if (ind == 0)
+                p = Edges.Count - 1;
+
+            return (Edges[n].type == RelationType.Regular || !(Edges[p].type == Edges[n].type));
+        }
+
+        public bool CheckRelationsOfEdge(int ind, RelationType type)
+        {
+            int p = ind - 1, n = (ind + 1) % Edges.Count;
+            if(ind == 0)
+                p =  Edges.Count - 1;
+            return (type == RelationType.Regular || (Edges[n].type != type && type != Edges[p].type));
         }
     }
 
     public class Edge
     {
+        public RelationType type { get; set; }
+        public Edge? p1Edge, p2Edge;
         public Point p1;
         public Point p2;
 
@@ -486,6 +543,7 @@ namespace GK_Proj_1
         {
             p1 = pnt1;
             p2 = pnt2;
+            type = RelationType.Regular;
         }
 
         public void Draw(DrawingContext dc)
@@ -533,59 +591,211 @@ namespace GK_Proj_1
             return (closestpt - pt).Length < 10;
         }
 
-        public virtual (double x, double y) MoveP1To(Point pt)
+        public virtual bool AdjustP1()
         {
-            p1 = pt;
-            return (0, 0);
+            if(p1Edge == null)
+                return false;
+            p1 = p1Edge.p2;
+            return true;
         }
 
-        public virtual (double x, double y) MoveP2To(Point pt)
+        public virtual bool AdjustP2()
         {
-            p2 = pt;
-            return (0, 0);
+            if (p2Edge == null)
+                return false;
+            p2 = p2Edge.p1;
+            return true;
+        }
+
+        public virtual bool MoveP1To(Point pt)
+        {
+            p1 = pt;
+            return p1Edge.AdjustP2();
         }
     }
 
     public class HorizontalEdge : Edge
     {
-        public HorizontalEdge(Point p1, Point p2): base(p1, new Point(p2.X, p1.Y)) {}
+        public HorizontalEdge(Point p1, Point p2): base(p1, new Point(p2.X, p1.Y)) { base.type = RelationType.Horizontal; }
 
-        public override (double x, double y) MoveP1To(Point pt)
+        public override bool AdjustP1()
         {
-            double y = pt.Y - p1.Y;
-            p1 = pt;
-            p2.Y = pt.Y;
-            return (0,y);
+            if(p1Edge == null)
+                return false;
+            if (p1.Y == p1Edge.p2.Y)
+            {
+                p1 = p1Edge.p2;
+                return true;
+            }
+
+            switch (p2Edge.type)
+            {
+                case RelationType.FixedLen:
+                    {
+                        return true;
+                    }
+                default:
+                    {
+                        Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
+                        bool res = false;
+                        p1 = p1Edge.p2;
+                        p2 = new Point(p2.X , p1.Y);
+                        if (p2Edge != null)
+                            res = p2Edge.AdjustP1();
+                        if(!res)
+                        {
+                            p1 = oldp1;
+                            p2 = oldp2;
+                        }
+                        return res;
+                    }
+            }
         }
 
-        public override (double x, double y) MoveP2To(Point pt)
+        public override bool AdjustP2()
         {
-            double y = pt.Y - p2.Y;
-            p2 = pt;
-            p1.Y = pt.Y;
-            return (0, y);
+            if(p2Edge == null)
+                return false;
+            if(p1.Y == p2Edge.p1.Y)
+            {
+                p2 = p2Edge.p1;
+                return true;
+            }
+
+            switch(p1Edge.type) 
+            {
+                case RelationType.FixedLen:
+                    {
+                        return true;
+                    }
+                default: 
+                    {
+                        Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
+                        bool res = false;
+                        p2 = p2Edge.p1;
+                        p1 = new Point(p1.X, p2.Y);
+                        if(p1Edge != null)
+                            res = p1Edge.AdjustP2();
+                        if(!res) 
+                        {
+                            p1 = oldp1;
+                            p2 = oldp2;
+                        }
+                        return res;
+                    }
+            }
+        }
+
+        public override bool MoveP1To(Point pt)
+        {
+            if((pt - p2).Length <= 2)
+                return false;
+            Point oldp1 = new Point(base.p1.X, base.p1.Y), oldp2 = new Point(base.p2.X, base.p2.Y);
+            base.p1 = pt;
+            p2.Y = pt.Y;
+            bool res = p1Edge.AdjustP2();
+            if(!res)
+            {
+                base.p1 = oldp1;
+                base.p2 = oldp2;
+                return res;
+            }
+            return base.p2Edge.AdjustP1();
         }
     }
 
     public class VerticalEdge : Edge
     {
+        public VerticalEdge(Point p1, Point p2) : base(p1, new Point(p1.X, p2.Y)) { base.type = RelationType.Vertical; }
 
-        public VerticalEdge(Point p1, Point p2) : base(p1, new Point(p1.X, p2.Y)) {}
-
-        public override (double x, double y) MoveP1To(Point pt)
+        public override bool AdjustP1()
         {
-            double x = pt.X - p1.X;
-            p1 = pt;
-            p2.X = pt.X;
-            return (x, 0);
+            if (p1Edge == null)
+                return false;
+            if (p1.X == p1Edge.p2.X)
+            {
+                p1 = p1Edge.p2;
+                return true;
+            }
+
+            switch (p2Edge.type)
+            {
+                case RelationType.FixedLen:
+                    {
+                        return true;
+                    }
+                default:
+                    {
+                        Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
+                        bool res = false;
+                        p1 = p1Edge.p2;
+                        p2 = new Point(p1.X, p2.Y);
+                        if (p2Edge != null)
+                            res = p2Edge.AdjustP1();
+                        if(!res) 
+                        {
+                            p1 = oldp1;
+                            p2 = oldp2;
+                        }
+                        return res;
+                    }
+            }
         }
 
-        public override (double x, double y) MoveP2To(Point pt)
+        public override bool AdjustP2()
         {
-            double x = pt.X - p2.X;
-            p2 = pt;
-            p1.X = pt.X;
-            return (x, 0);
+            if (p2Edge == null)
+                return false;
+            if (p1.X == p2Edge.p1.X)
+            {
+                p2 = p2Edge.p1;
+                return true;
+            }
+
+            switch (p1Edge.type)
+            {
+                case RelationType.FixedLen:
+                    {
+                        return true;
+                    }
+                default:
+                    {
+                        Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
+                        bool res = false;
+                        p2 = p2Edge.p1;
+                        p1 = new Point(p2.X, p1.Y);
+                        if (p1Edge != null)
+                            res = p1Edge.AdjustP2();
+                        if(!res)
+                        {
+                            p1 = oldp1;
+                            p2 = oldp2;
+                        }
+                        return res;
+                    }
+            }
         }
+
+        public override bool MoveP1To(Point pt)
+        {
+            if ((pt - p2).Length <= 2)
+                return false;
+            Point oldp1 = new Point(base.p1.X, base.p1.Y), oldp2 = new Point(base.p2.X, base.p2.Y);
+            base.p1 = pt;
+            base.p2.X = pt.X;
+            bool res = base.p1Edge.AdjustP2();
+            if (!res)
+            {
+                base.p1 = oldp1;
+                base.p2 = oldp2;
+                return res;
+            }
+            return base.p2Edge.AdjustP1();
+        }
+    }
+
+    public class FixedLenEdge : Edge
+    {
+        public FixedLenEdge(Point p1, Point p2) : base(p1,p2){ }
     }
 }
