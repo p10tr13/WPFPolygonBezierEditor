@@ -49,15 +49,26 @@ namespace GK_Proj_1
         private void InitializeEdgeContextMenu()
         {
             edgeContextMenu = new ContextMenu();
+
             MenuItem addVertMenuItem = new MenuItem { Header = "Add vertex" };
             edgeContextMenu.Items.Add(addVertMenuItem);
             addVertMenuItem.Click += AddVertexItemClick;
+
             MenuItem horEdgeMenuItem = new MenuItem { Header = "Change type to horizontal" };
             edgeContextMenu.Items.Add(horEdgeMenuItem);
             horEdgeMenuItem.Click += HorEdgeItemClick;
+
             MenuItem verEdgeMenuItem = new MenuItem { Header = "Change type to vertical" };
             edgeContextMenu.Items.Add(verEdgeMenuItem);
             verEdgeMenuItem.Click += VerEdgeItemClick;
+
+            MenuItem fixEdgeMenuItem = new MenuItem { Header = "Change type to fixed length" };
+            edgeContextMenu.Items.Add(fixEdgeMenuItem);
+            fixEdgeMenuItem.Click += FixEdgeItemClick;
+
+            MenuItem deleteRelMenuItem = new MenuItem { Header = "Delete relation if exists" };
+            edgeContextMenu.Items.Add(deleteRelMenuItem);
+            deleteRelMenuItem.Click += DeleteRelItemClick;
         }
 
         private void DeleteMenuItemClick(object sender, RoutedEventArgs e)
@@ -123,6 +134,26 @@ namespace GK_Proj_1
             drawingFigure.AddEdgeAt(selectedEdge, ved);
             ved.p1Edge.AdjustP2();
             ved.p2Edge.AdjustP1();
+            Redraw();
+        }
+
+        private void FixEdgeItemClick(object sender, RoutedEventArgs e)
+        {
+            Edge ed = drawingFigure.Edges[selectedEdge];
+            FixedLenEdge fix = new FixedLenEdge(ed.p1, ed.p2);
+            drawingFigure.Edges.RemoveAt(selectedEdge);
+            drawingFigure.AddEdgeAt(selectedEdge, fix);
+            Redraw();
+        }
+
+        private void DeleteRelItemClick(object sender, RoutedEventArgs e)
+        {
+            if (drawingFigure.Edges[selectedEdge].type == RelationType.Regular)
+                return;
+            Edge edToDel = drawingFigure.Edges[selectedEdge];
+            Edge ed = new Edge(edToDel.p1, edToDel.p2);
+            drawingFigure.Edges.RemoveAt(selectedEdge);
+            drawingFigure.AddEdgeAt(selectedEdge, ed);
             Redraw();
         }
 
@@ -520,7 +551,7 @@ namespace GK_Proj_1
             if (ind == 0)
                 p = Edges.Count - 1;
 
-            return (Edges[n].type == RelationType.Regular || !(Edges[p].type == Edges[n].type));
+            return (Edges[n].type == RelationType.Regular || Edges[n].type == RelationType.FixedLen || Edges[n].type == RelationType.Bezier || !(Edges[p].type == Edges[n].type));
         }
 
         public bool CheckRelationsOfEdge(int ind, RelationType type)
@@ -528,7 +559,7 @@ namespace GK_Proj_1
             int p = ind - 1, n = (ind + 1) % Edges.Count;
             if(ind == 0)
                 p =  Edges.Count - 1;
-            return (type == RelationType.Regular || (Edges[n].type != type && type != Edges[p].type));
+            return (type == RelationType.Regular || type == RelationType.FixedLen || type == RelationType.Bezier || (Edges[n].type != type && type != Edges[p].type));
         }
     }
 
@@ -796,6 +827,77 @@ namespace GK_Proj_1
 
     public class FixedLenEdge : Edge
     {
-        public FixedLenEdge(Point p1, Point p2) : base(p1,p2){ }
+        public FixedLenEdge(Point p1, Point p2) : base(p1,p2) { length = (p1 - p2).Length; }
+
+        public double length { get; }
+
+        public override bool MoveP1To(Point pt)
+        {
+            Point oldp1 = new Point(base.p1.X, base.p1.Y), oldp2 = new Point(base.p2.X, base.p2.Y);
+            p1 = pt;
+            p2 = CalculateOtherPointsPosition(p1, p2);
+            bool res = p1Edge.AdjustP2();
+            if(!res)
+            {
+                p1 = oldp1;
+                p2 = oldp2;
+                return res;
+            }
+            return p2Edge.AdjustP1();
+        }
+
+        public override bool AdjustP1()
+        {
+            if (p1Edge == null || p2Edge == null)
+                return false;
+
+            Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
+            p1 = p1Edge.p2;
+
+            p2 = CalculateOtherPointsPosition(p1, p2);
+
+            bool res = p2Edge.AdjustP1();
+            if (!res)
+            {
+                p1 = oldp1;
+                p2 = oldp2;
+            }
+            return res;
+        }
+
+        public override bool AdjustP2()
+        {
+            if (p1Edge == null || p2Edge == null)
+                return false;
+
+            Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
+            p2 = p2Edge.p1;
+            
+            p1 = CalculateOtherPointsPosition(p2, p1);
+
+            bool res = p1Edge.AdjustP2();
+            if (!res)
+            {
+                p1 = oldp1;
+                p2 = oldp2;
+            }
+            return res;
+        }
+
+        private Point CalculateOtherPointsPosition(Point p1, Point p2)
+        {
+            Point res = new Point();
+            double dist = (p2 - p1).Length;
+
+            //Wektor jednostkowy do przesunięcia
+            double unitX = (p2.X - p1.X) / dist;
+            double unitY = (p2.Y - p1.Y) / dist;
+
+            //Przesunięcie
+            res.X = p1.X + unitX * length;
+            res.Y = p1.Y + unitY * length;
+
+            return res;
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace GK_Proj_1
         Regular,
         Vertical,
         Horizontal,
-        FixedLen
+        FixedLen,
+        Bezier
     }
 }
