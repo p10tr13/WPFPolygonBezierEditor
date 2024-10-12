@@ -108,7 +108,7 @@ namespace GK_Proj_1
             Point middle = drawingFigure.Edges[selectedEdge].ClosestPointOnEdge(addVertPoint);
             Edge ed = new Edge(middle, drawingFigure.Edges[selectedEdge].p2);
             drawingFigure.AddEdgeAt(selectedEdge + 1, ed);
-            drawingFigure.Edges[selectedEdge].AdjustP2();            
+            drawingFigure.Edges[selectedEdge].AdjustP2(1, drawingFigure.Edges.Count);            
             Redraw();
         }
 
@@ -120,8 +120,8 @@ namespace GK_Proj_1
             HorizontalEdge hed = new HorizontalEdge(ed.p1,ed.p2);
             drawingFigure.Edges.RemoveAt(selectedEdge);
             drawingFigure.AddEdgeAt(selectedEdge, hed);
-            hed.p1Edge.AdjustP2();
-            hed.p2Edge.AdjustP1();
+            hed.p1Edge.AdjustP2(0, drawingFigure.Edges.Count);
+            hed.p2Edge.AdjustP1(1, drawingFigure.Edges.Count);
             Redraw();
         }
 
@@ -133,8 +133,8 @@ namespace GK_Proj_1
             VerticalEdge ved = new VerticalEdge(ed.p1, ed.p2);
             drawingFigure.Edges.RemoveAt(selectedEdge);
             drawingFigure.AddEdgeAt(selectedEdge, ved);
-            ved.p1Edge.AdjustP2();
-            ved.p2Edge.AdjustP1();
+            ved.p1Edge.AdjustP2(1, drawingFigure.Edges.Count);
+            ved.p2Edge.AdjustP1(1, drawingFigure.Edges.Count);
             Redraw();
         }
 
@@ -168,12 +168,9 @@ namespace GK_Proj_1
                 return;
             }
 
-            if (draggingVert && (lastMousePosition - pt).Length > 2)
+            if (draggingVert && (drawingFigure.Edges[selectedVert].p1 - pt).Length > 2)
             {
-                //drawingFigure.MoveVert(pt.X - lastMousePosition.X, pt.Y - lastMousePosition.Y, selectedVert);
-                //drawingFigure.AdjustToVert(pt,selectedVert);
-                if (!drawingFigure.TryMoveVert(pt, selectedVert))
-                    return;
+                drawingFigure.TryMoveVert(pt, selectedVert);
                 Redraw();
                 lastMousePosition = pt;
                 return;
@@ -181,7 +178,7 @@ namespace GK_Proj_1
 
             if (draggingEdge && (lastMousePosition - pt).Length > 2)
             {
-                drawingFigure.MoveEdge(pt.X - lastMousePosition.X, pt.Y - lastMousePosition.Y, selectedEdge);
+                drawingFigure.TryMoveEdge(pt.X - lastMousePosition.X, pt.Y - lastMousePosition.Y, selectedEdge);
                 Redraw();
                 lastMousePosition = pt;
                 return;

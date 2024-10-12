@@ -252,7 +252,18 @@ namespace GK_Proj_1
 
         public bool TryMoveVert(Point pt, int vertind)
         {
-            return Edges[vertind].MoveP1To(pt);
+            if(Edges[vertind].MoveP1To(pt,Edges.Count))
+                return true;
+            SimpleMove(pt.X - Edges[vertind].p1.X, pt.Y - Edges[vertind].p1.Y);
+            return false;
+        }
+
+        public bool TryMoveEdge(double x, double y, int edgeind)
+        {
+            if (Edges[edgeind].MoveEdge(x, y, Edges.Count))
+                return true;
+            SimpleMove(x, y);
+            return false;
         }
 
         public bool CheckRelationsWithoutEdge(int ind)

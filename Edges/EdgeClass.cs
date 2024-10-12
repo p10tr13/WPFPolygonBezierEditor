@@ -23,7 +23,7 @@ namespace GK_Proj_1.Edges
             type = RelationType.Regular;
         }
 
-        public void Draw(DrawingContext dc)
+        public virtual void Draw(DrawingContext dc)
         {
             Pen pen = new Pen(Brushes.CadetBlue, 3);
             dc.DrawLine(pen, p1, p2);
@@ -68,7 +68,7 @@ namespace GK_Proj_1.Edges
             return (closestpt - pt).Length < 10;
         }
 
-        public virtual bool AdjustP1()
+        public virtual bool AdjustP1(int ind, int maxRecCount)
         {
             if (p1Edge == null)
                 return false;
@@ -76,7 +76,7 @@ namespace GK_Proj_1.Edges
             return true;
         }
 
-        public virtual bool AdjustP2()
+        public virtual bool AdjustP2(int ind, int maxRecCount)
         {
             if (p2Edge == null)
                 return false;
@@ -84,10 +84,55 @@ namespace GK_Proj_1.Edges
             return true;
         }
 
-        public virtual bool MoveP1To(Point pt)
+        public virtual bool MoveP1To(Point pt, int edgesCount)
         {
             p1 = pt;
-            return p1Edge.AdjustP2();
+            return p1Edge.AdjustP2(0, edgesCount);
+        }
+
+        public virtual bool MoveEdge(double x, double y, int edgesCount)
+        {
+            if(p1Edge == null || p2Edge == null)
+                return false;
+            p1.X += x;
+            p1.Y += y;
+            p2.X += x;
+            p2.Y += y;
+            bool res = p1Edge.AdjustP2(1, edgesCount);
+            if(!res)
+            {
+                p1.X -= x;
+                p1.Y -= y;
+                p2.X -= x;
+                p2.Y -= y;
+                return res;
+            }
+            res = p2Edge.AdjustP1(1, edgesCount);
+            if (!res)
+            {
+                p1.X -= x;
+                p1.Y -= y;
+                p2.X -= x;
+                p2.Y -= y;
+            }
+            return res;
+        }
+
+        public Point GetMiddle()
+        {
+            Point middle = new Point();
+
+            if (p1.X < p2.X)
+                middle.X = p1.X + (p2.X - p1.X)/2;
+            else
+                middle.X = p2.X + (p1.X - p2.X) / 2;
+
+            if (p1.Y < p2.Y)
+                middle.Y = p1.Y + (p2.Y - p1.Y) / 2;
+            else
+                middle.Y = p2.Y + (p1.Y - p2.Y) / 2;
+
+            return middle;
         }
     }
 }
