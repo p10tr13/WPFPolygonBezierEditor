@@ -250,7 +250,7 @@ namespace GK_Proj_1
             edge.p2Edge = Edges[ind + 1];
         }
 
-        public bool TryMoveVert(Point pt, int vertind)
+        public bool TryMoveVert(Point pt, int vertind)  
         {
             if(Edges[vertind].MoveP1To(pt,Edges.Count))
                 return true;
@@ -260,7 +260,7 @@ namespace GK_Proj_1
 
         public bool TryMoveEdge(double x, double y, int edgeind)
         {
-            if (Edges[edgeind].MoveEdge(x, y, Edges.Count))
+            if (Edges[edgeind].MoveEdge(x, y, Edges.Count - 1))
                 return true;
             SimpleMove(x, y);
             return false;

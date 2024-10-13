@@ -11,7 +11,7 @@ namespace GK_Proj_1.Edges
 {
     public class VerticalEdge : Edge
     {
-        public VerticalEdge(Point p1, Point p2) : base(p1, new Point(p1.X, p2.Y)) { base.type = RelationType.Vertical; }
+        public VerticalEdge(Point p1, Point p2) : base(p1, new Point(p1.X, p2.Y)) { type = RelationType.Vertical; }
 
         public override bool AdjustP1(int ind, int maxRecCount)
         {
@@ -27,7 +27,7 @@ namespace GK_Proj_1.Edges
 
             switch (p2Edge.type)
             {
-                case RelationType.FixedLen:
+                case RelationType.Bezier:
                     {
                         return true;
                     }
@@ -63,7 +63,7 @@ namespace GK_Proj_1.Edges
 
             switch (p1Edge.type)
             {
-                case RelationType.FixedLen:
+                case RelationType.Bezier:
                     {
                         return true;
                     }

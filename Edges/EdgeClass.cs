@@ -98,7 +98,7 @@ namespace GK_Proj_1.Edges
             p1.Y += y;
             p2.X += x;
             p2.Y += y;
-            bool res = p1Edge.AdjustP2(1, edgesCount);
+            bool res = p1Edge.AdjustP2(0, edgesCount - 1);
             if(!res)
             {
                 p1.X -= x;
@@ -107,7 +107,7 @@ namespace GK_Proj_1.Edges
                 p2.Y -= y;
                 return res;
             }
-            res = p2Edge.AdjustP1(1, edgesCount);
+            res = p2Edge.AdjustP1(0, edgesCount - 1);
             if (!res)
             {
                 p1.X -= x;

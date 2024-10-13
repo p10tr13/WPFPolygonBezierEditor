@@ -12,7 +12,7 @@ namespace GK_Proj_1.Edges
 {
     public class FixedLenEdge : Edge
     {
-        public FixedLenEdge(Point p1, Point p2) : base(p1, p2) { length = (p1 - p2).Length; }
+        public FixedLenEdge(Point p1, Point p2) : base(p1, p2) { length = (p1 - p2).Length; type = RelationType.FixedLen; }
 
         public double length { get; }
 
@@ -32,7 +32,7 @@ namespace GK_Proj_1.Edges
             res = p2Edge.AdjustP1(0, edgesCount);
             if (!res)
             {
-                
+
             }
             return res;
         }
@@ -45,39 +45,73 @@ namespace GK_Proj_1.Edges
                 return false;
 
             Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
-            p1 = p1Edge.p2;
 
-            p2 = CalculateOtherPointsPosition(p1, p2);
-
-            if (p1Edge.type == RelationType.Horizontal && p2Edge.type == RelationType.Horizontal)
+            if (p1Edge.type == RelationType.Vertical)
             {
-                if(length < Math.Abs(p1Edge.p2.Y - p2Edge.p1.Y))
+                if (Math.Abs(p2.X - p1Edge.p2.X) < length)
                 {
-                    p2.X = p1.X;
-                    if(p1Edge.p2.Y < p2Edge.p1.Y)
-                        p2.Y = p1.Y + length;
-                    else
-                        p2.Y = p1.Y - length;
+                    if (ind != 0)
+                    {
+                        double z = Math.Sqrt(Math.Pow(length, 2) - Math.Pow(p2.X - p1Edge.p2.X, 2));
+                        p1.X = p1Edge.p2.X;
+                        if (Math.Abs(p2.Y - z - p1Edge.p2.Y) < Math.Abs(p2.Y + z - p1Edge.p2.Y))
+                            p1.Y = p2.Y - z;
+                        else
+                            p1.Y = p2.Y + z;
+                        p1Edge.p2.Y = p1.Y;
+                        return true;
+                    }
                 }
                 else
                 {
-                    double z = Math.Sqrt(Math.Pow(length, 2) - Math.Pow(p2Edge.p1.Y - p1.Y, 2));
-                    if (p1.X - z - p2Edge.p1.X < p1.X + z - p2Edge.p1.X)
-                        p2.X = p1.X - z;
+                    if (p1.X < p1Edge.p2.X)
+                        p2.X = p1Edge.p2.X - length;
                     else
-                        p2.X = p1.X + z;
-                    p2.Y = p2Edge.p1.Y;
-                    if (maxRecCount - ind == 1)
+                        p2.X = p1Edge.p2.X + length;
+                    p1.X = p1Edge.p2.X;
+                    p1.Y = p1Edge.p2.Y;
+                    p2.Y = p1.Y;
+
+                    //Temporary
+                    goto Exit;
+                }
+            }
+
+            if (p1Edge.type == RelationType.Horizontal)
+            {
+                if (length < Math.Abs(p2.Y - p1Edge.p2.Y))
+                {
+                    if (p1.Y < p1Edge.p2.Y)
+                        p2.Y = p1Edge.p2.Y - length;
+                    else
+                        p2.Y = p1Edge.p2.Y + length;
+                    p1.X = p1Edge.p2.X;
+                    p1.Y = p1Edge.p2.Y;
+                    p2.X = p1.X;
+                    goto Exit;
+                }
+                else
+                {
+                    if (ind != 0)
                     {
-                        double s = p2.X - p2Edge.p1.X;
-                        p2.X = p2Edge.p1.X;
-                        p1Edge.p2.X += s;
-                        p1.X += s;
+                        double z = Math.Sqrt(Math.Pow(length, 2) - Math.Pow(p2.Y - p1Edge.p2.Y, 2));
+
+                        if (Math.Abs(p2.X + z - p1Edge.p2.X) < Math.Abs(p2.X - z - p1Edge.p2.X))
+                            p1Edge.p2.X = p2.X + z;
+                        else
+                            p1Edge.p2.X = p2.X - z;
+                        p1.X = p1Edge.p2.X;
+                        p1.Y = p1Edge.p2.Y;
                         return true;
                     }
                 }
             }
 
+            p1 = p1Edge.p2;
+
+            p2 = CalculateOtherPointsPosition(p1, p2);
+
+        Exit:
             bool res = p2Edge.AdjustP1(++ind, maxRecCount);
             if (!res)
             {
@@ -95,40 +129,78 @@ namespace GK_Proj_1.Edges
                 return false;
 
             Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
-            p2 = p2Edge.p1;
 
-            p1 = CalculateOtherPointsPosition(p2, p1);
-
-            if (p1Edge.type == RelationType.Horizontal && p2Edge.type == RelationType.Horizontal)
+            if (p2Edge.type == RelationType.Vertical)
             {
-                if (length < Math.Abs(p2Edge.p1.Y - p1Edge.p2.Y))
+                if (length > Math.Abs(p2Edge.p1.X - p1.X))
                 {
-                    p1.X = p2.X;
-                    if (p2Edge.p1.Y < p1Edge.p2.Y)
-                        p1.Y = p2.Y + length;
-                    else
-                        p1.Y = p2.Y - length;
+                    if (ind != 0)
+                    {
+                        double z = Math.Sqrt(Math.Pow(length, 2) - Math.Pow(p2Edge.p1.X - p1.X, 2));
+                        p2.X = p2Edge.p1.X;
+                        if (Math.Abs(p1.Y - z - p2Edge.p1.Y) < Math.Abs(p1.Y + z - p2Edge.p1.Y))
+                            p2.Y = p1.Y - z;
+                        else
+                            p2.Y = p1.Y + z;
+                        p2Edge.p1.Y = p2.Y;
+                        return true;
+                    }
                 }
                 else
                 {
-                    double z = Math.Sqrt(Math.Pow(length, 2) - Math.Pow(p1Edge.p2.Y - p2.Y, 2));
-                    if (p2.X - z - p1Edge.p2.X > p2.X + z - p1Edge.p2.X)
-                        p1.X = p2.X - z;
-                    else
-                        p1.X = p2.X + z;
-                    p1.Y = p1Edge.p2.Y;
-
-                    if(maxRecCount - ind == 1)
+                    if (ind != 0)
                     {
-                        double s = p1.X - p1Edge.p2.X;
-                        p1.X = p1Edge.p2.X;
-                        p2Edge.p1.X -= s;
-                        p2.X -= s;
+                        if (p2.X < p2Edge.p1.X)
+                            p1.X = p2Edge.p1.X - length;
+                        else
+                            p1.X = p2Edge.p1.X + length;
+                        p2.X = p2Edge.p1.X;
+                        p2.Y = p2Edge.p1.Y;
+                        p1.Y = p2.Y;
+
+                        //Temporary
+                        goto Exit;
+                    }
+                }
+            }
+
+            if (p2Edge.type == RelationType.Horizontal)
+            {
+                if (length < Math.Abs(p1.Y - p2Edge.p1.Y))
+                {
+                    if(ind != 0)
+                    {
+                        if (p2Edge.p1.Y > p2.Y)
+                            p1.Y = p2Edge.p1.Y - length;
+                        else
+                            p1.Y = p2Edge.p1.Y + length;
+                        p2.X = p2Edge.p1.X;
+                        p2.Y = p2Edge.p1.Y;
+                        p1.X = p2.X;
+                        goto Exit;
+                    }
+                }
+                else
+                {
+                    if (ind != 0)
+                    {
+                        double z = Math.Sqrt(Math.Pow(length, 2) - Math.Pow(p2Edge.p1.Y - p1.Y, 2));
+                        if (Math.Abs(p1.X - z - p2Edge.p1.X) > Math.Abs(p1.X + z - p2Edge.p1.X))
+                            p2Edge.p1.X = p1.X + z;
+                        else
+                            p2Edge.p1.X = p1.X - z;
+                        p2.X = p2Edge.p1.X;
+                        p2.Y = p2Edge.p1.Y;
                         return true;
                     }
                 }
             }
-            
+
+            p2 = p2Edge.p1;
+
+            p1 = CalculateOtherPointsPosition(p2, p1);
+
+        Exit:
             bool res = p1Edge.AdjustP2(++ind, maxRecCount);
             if (!res)
             {
@@ -159,7 +231,7 @@ namespace GK_Proj_1.Edges
             base.Draw(dc);
             Point middle = GetMiddle();
             middle.Y -= 20;
-            FormattedText ft = new FormattedText(Math.Round(length,2).ToString(), System.Globalization.CultureInfo.InvariantCulture,
+            FormattedText ft = new FormattedText(Math.Round(length, 2).ToString(), System.Globalization.CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight, new Typeface("Arial"), 20,
                 Brushes.Brown, VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
             middle.X -= ft.Width / 2;

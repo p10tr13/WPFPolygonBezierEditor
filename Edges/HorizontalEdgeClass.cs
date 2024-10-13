@@ -12,7 +12,7 @@ namespace GK_Proj_1.Edges
 {
     public class HorizontalEdge : Edge
     {
-        public HorizontalEdge(Point p1, Point p2) : base(p1, new Point(p2.X, p1.Y)) { base.type = RelationType.Horizontal; }
+        public HorizontalEdge(Point p1, Point p2) : base(p1, new Point(p2.X, p1.Y)) { type = RelationType.Horizontal; }
 
         public override bool AdjustP1(int ind, int maxRecCount)
         {
