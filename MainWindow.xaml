@@ -5,8 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GK_Proj_1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1000" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="MainWindow" Height="700" Width="1200" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Grid>
-        <Canvas x:Name="Canva" Background="White" Height="700" Width="1000" MouseLeftButtonUp="Canvas_MouseLeftButtonUp"  MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="Canvas_MouseMove" MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1000"/>
+            <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="3" Margin="5">
+        <Canvas x:Name="Canva" Background="White" MouseLeftButtonUp="Canvas_MouseLeftButtonUp"  MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="Canvas_MouseMove" MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
+        </Border>
+        <StackPanel Grid.Column="1">
+            <TextBlock>Sposób rysowania krawędzi:</TextBlock>
+            <RadioButton x:Name="windowsRadioButton" IsChecked="True" Checked="WindowsRadioButtonChecked" >Windows</RadioButton>
+            <RadioButton x:Name="bresenhanRadioButton" Checked="BresenhamRadioButtonChecked" IsChecked="False">Bresenham</RadioButton>
+        </StackPanel>
     </Grid>
 </Window>

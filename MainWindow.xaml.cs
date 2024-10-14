@@ -25,6 +25,7 @@ namespace GK_Proj_1
             InitializeComponent();
             InitializeVertContextMenu();
             InitializeEdgeContextMenu();
+            Var.DrawingStyle = DrawingStyle.Windows;
         }
 
         private ContextMenu vertContextMenu, edgeContextMenu;
@@ -158,6 +159,21 @@ namespace GK_Proj_1
             Redraw();
         }
 
+        private void BresenhamRadioButtonChecked(object sender, RoutedEventArgs e)
+        {
+            Var.DrawingStyle = DrawingStyle.Bresenham;
+            Redraw();
+            if(windowsRadioButton != null)
+                windowsRadioButton.IsChecked = false;
+        }
+
+        private void WindowsRadioButtonChecked(object sender, RoutedEventArgs e)
+        {
+            Var.DrawingStyle = DrawingStyle.Windows;
+            if(bresenhanRadioButton != null)
+                bresenhanRadioButton.IsChecked = false;
+        }
+
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
             Point pt = e.GetPosition(Canva);
@@ -195,7 +211,7 @@ namespace GK_Proj_1
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Point pt = e.GetPosition(this);
+            Point pt = e.GetPosition(Canva);
 
             if (!drawing && drawingFigure.Edges.Count <= 1)
             {
@@ -251,7 +267,7 @@ namespace GK_Proj_1
 
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Point pt = e.GetPosition(this);
+            Point pt = e.GetPosition(Canva);
             if (drawing || drawingFigure.Edges.Count < 2)
                 return;
             if (drawingFigure.IsNearVert(pt, out int vertind))

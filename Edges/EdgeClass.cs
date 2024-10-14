@@ -25,9 +25,21 @@ namespace GK_Proj_1.Edges
 
         public virtual void Draw(DrawingContext dc)
         {
-            Pen pen = new Pen(Brushes.CadetBlue, 3);
-            dc.DrawLine(pen, p1, p2);
-            dc.DrawEllipse(Brushes.Purple, null, p1, 4, 4);
+            switch(Var.DrawingStyle)
+            {
+                case DrawingStyle.Windows:
+                    {
+                        Pen pen = new Pen(Var.EdgeColor, 3);
+                        dc.DrawLine(pen, p1, p2);
+                        break;
+                    }
+                case DrawingStyle.Bresenham:
+                    {
+                        DrawingAlgorithms.DrawBresenhamLine(p1, p2, dc);
+                        break;
+                    }
+            }
+            dc.DrawEllipse(Var.VertColor, null, p1, Var.VertSize, Var.VertSize);
         }
 
         public bool IsNearP1Vert(Point pt)
