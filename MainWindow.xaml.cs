@@ -68,6 +68,10 @@ namespace GK_Proj_1
             edgeContextMenu.Items.Add(fixEdgeMenuItem);
             fixEdgeMenuItem.Click += FixEdgeItemClick;
 
+            MenuItem bezEdgeMenuItem = new MenuItem { Header = "Change type to Bezier" };
+            edgeContextMenu.Items.Add(bezEdgeMenuItem);
+            bezEdgeMenuItem.Click += BezEdgeItemClick;
+
             MenuItem deleteRelMenuItem = new MenuItem { Header = "Delete relation if exists" };
             edgeContextMenu.Items.Add(deleteRelMenuItem);
             deleteRelMenuItem.Click += DeleteRelItemClick;
@@ -145,6 +149,17 @@ namespace GK_Proj_1
             FixedLenEdge fix = new FixedLenEdge(ed.p1, ed.p2);
             drawingFigure.Edges.RemoveAt(selectedEdge);
             drawingFigure.AddEdgeAt(selectedEdge, fix);
+            Redraw();
+        }
+
+        private void BezEdgeItemClick(object sender, RoutedEventArgs e)
+        {
+            Edge ed = drawingFigure.Edges[selectedEdge];
+            BezierEdge bed = new BezierEdge(ed.p1, ed.p2);
+            drawingFigure.Edges.RemoveAt(selectedEdge);
+            drawingFigure.AddEdgeAt(selectedEdge, bed);
+            bed.p1Edge.AdjustP2(1, drawingFigure.Edges.Count);
+            bed.p2Edge.AdjustP1(1, drawingFigure.Edges.Count);
             Redraw();
         }
 
