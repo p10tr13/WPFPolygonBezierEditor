@@ -100,7 +100,7 @@ namespace GK_Proj_1
         // p0 - p3 to odpowiednio początki o końce krzywej Beziera
         public static void DrawBezierCurve(Point p0, Point p1, Point p2, Point p3, DrawingContext dc)
         {
-            List<(int x, int y)> pixels = BezierCubicLine((int)p0.X, (int)p0.Y,(float)p1.X, (float)p1.Y, (float)p2.X, (float)p2.Y, (int)p3.X, (int)p3.Y);
+            List<(int x, int y)> pixels = BezierCubicLine((int)p0.X, (int)p0.Y,(int)p1.X, (int)p1.Y, (int)p2.X, (int)p2.Y, (int)p3.X, (int)p3.Y);
             foreach ((int x, int y) in pixels)
             {
                 dc.DrawRectangle(Var.EdgeColor, null, new System.Windows.Rect(x, y, 3, 3));
@@ -108,7 +108,63 @@ namespace GK_Proj_1
         }
 
         // Alois Zingl
-        public static List<(int x, int y)> BezierCubicLine(int x0, int y0, float x1, float y1, float x2, float y2, int x3, int y3)
+        public static List<(int x, int y)> BezierCubicLine(int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3)
+        {
+            List<(int, int)> pixels = new List<(int, int)> ();
+
+            int n = 0, i = 0;
+            long xc = x0 + x1 - x2 - x3, xa = xc - 4 * (x1 - x2);
+            long xb = x0 - x1 - x2 + x3, xd = xb + 4 * (x1 + x2);
+            long yc = y0 + y1 - y2 - y3, ya = yc - 4 * (y1 - y2);
+            long yb = y0 - y1 - y2 + y3, yd = yb + 4 * (y1 + y2);
+            float fx0 = x0, fx1, fx2, fx3, fy0 = y0, fy1, fy2, fy3;
+            double t1 = xb * xb - xa * xc, t2;
+            double[] t = new double[5];
+            /* sub-divide curve at gradient sign changes */
+            if (xa == 0)
+            { /* horizontal */
+                if (Math.Abs(xc) < 2 * Math.Abs(xb)) t[n++] = xc / (2.0 * xb); /* one change */
+            }
+            else if (t1 > 0.0)
+            { /* two changes */
+                t2 = Math.Sqrt(t1);
+                t1 = (xb - t2) / xa; if (Math.Abs(t1) < 1.0) t[n++] = t1;
+                t1 = (xb + t2) / xa; if (Math.Abs(t1) < 1.0) t[n++] = t1;
+            }
+            t1 = yb * yb - ya * yc;
+            if (ya == 0)
+            { /* vertical */
+                if (Math.Abs(yc) < 2 * Math.Abs(yb)) t[n++] = yc / (2.0 * yb); /* one change */
+            }
+            else if (t1 > 0.0)
+            { /* two changes */
+                t2 = Math.Sqrt(t1);
+                t1 = (yb - t2) / ya; if (Math.Abs(t1) < 1.0) t[n++] = t1;
+                t1 = (yb + t2) / ya; if (Math.Abs(t1) < 1.0) t[n++] = t1;
+            }
+            for (i = 1; i < n; i++) /* bubble sort of 4 points */
+                if ((t1 = t[i - 1]) > t[i]) { t[i - 1] = t[i]; t[i] = t1; i = 0; }
+            t1 = -1.0; t[n] = 1.0; /* begin / end point */
+            for (i = 0; i <= n; i++)
+            { /* plot each segment separately */
+                t2 = t[i]; /* sub-divide at t[i-1], t[i] */
+                fx1 = (float)((t1 * (t1 * xb - 2 * xc) - t2 * (t1 * (t1 * xa - 2 * xb) + xc) + xd) / 8 - fx0);
+                fy1 = (float)((t1 * (t1 * yb - 2 * yc) - t2 * (t1 * (t1 * ya - 2 * yb) + yc) + yd) / 8 - fy0);
+                fx2 = (float)((t2 * (t2 * xb - 2 * xc) - t1 * (t2 * (t2 * xa - 2 * xb) + xc) + xd) / 8 - fx0);
+                fy2 = (float)((t2 * (t2 * yb - 2 * yc) - t1 * (t2 * (t2 * ya - 2 * yb) + yc) + yd) / 8 - fy0);
+                fx0 -= fx3 = (float)((t2 * (t2 * (3 * xb - t2 * xa) - 3 * xc) + xd) / 8);
+                fy0 -= fy3 = (float)((t2 * (t2 * (3 * yb - t2 * ya) - 3 * yc) + yd) / 8);
+                x3 = (int)Math.Floor(fx3 + 0.5); y3 = (int)Math.Floor(fy3 + 0.5); /* scale bounds to int */
+                if (fx0 != 0.0) { fx1 *= fx0 = (x0 - x3) / fx0; fx2 *= fx0; }
+                if (fy0 != 0.0) { fy1 *= fy0 = (y0 - y3) / fy0; fy2 *= fy0; }
+                if (x0 != x3 || y0 != y3) /* segment t1 - t2 */
+                    pixels.AddRange(BezierCubicSeg(x0, y0, x0 + fx1, y0 + fy1, x0 + fx2, y0 + fy2, x3, y3));
+                x0 = x3; y0 = y3; fx0 = fx3; fy0 = fy3; t1 = t2;
+            }
+            return pixels;
+        }
+
+        public static List<(int x, int y)> BezierCubicSeg(int x0, int y0, float x1, float y1, float x2, float y2, int x3, int y3)
         {
             List<(int x, int y)> pixels = new List<(int x, int y)>();
 
@@ -123,7 +179,7 @@ namespace GK_Proj_1
             if (xa == 0 && ya == 0)
             { /* quadratic Bezier */
                 sx = (int)Math.Floor((3 * x1 - x0 + 1) / 2); sy = (int)Math.Floor((3 * y1 - y0 + 1) / 2); /* new midpoint */
-                return BezierQuadLine(x0, y0, sx, sy, x3, y3);
+                return BezierQuadSeg(x0, y0, sx, sy, x3, y3);
             }
 
             x1 = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0) + 1;
@@ -178,7 +234,7 @@ namespace GK_Proj_1
             return pixels;
         }
 
-        public static List<(int x, int y)> BezierQuadLine(int x0, int y0, int x1, int y1, int x2, int y2)
+        public static List<(int x, int y)> BezierQuadSeg(int x0, int y0, int x1, int y1, int x2, int y2)
         {
             List<(int x, int y)> pixels = new List<(int x, int y)> ();
             int sx = x2 - x1, sy = y2 - y1;
