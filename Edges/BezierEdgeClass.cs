@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,10 +18,10 @@ namespace GK_Proj_1.Edges
 
         private List<(int x, int y)> pixels;
 
-        public BezierEdge(System.Windows.Point pnt1, System.Windows.Point pnt2) : base(pnt1, pnt2)
+        public BezierEdge(Point pnt1, Point pnt2) : base(pnt1, pnt2)
         {
-            p1c = new Point(p1.X + 50, p1.Y + 50);
-            p2c = new Point(p2.X - 50, p2.Y - 50);
+            p1c = new Point((2* p1.X + 2 * p2.X - p2.Y + p1.Y)/4,(2 * p1.Y + 2 * p2.Y + p2.X - p1.X)/4);
+            p2c = new Point((2 * p1.X + 2 * p2.X + p2.Y - p1.Y) / 4, (2 * p1.Y + 2 * p2.Y - p2.X + p1.X) / 4);
             type = RelationType.Bezier;
         }
 
