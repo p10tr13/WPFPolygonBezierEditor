@@ -15,6 +15,8 @@ namespace GK_Proj_1.Edges
     {
         public Point p1c, p2c;
 
+        private List<(int x, int y)> pixels;
+
         public BezierEdge(System.Windows.Point pnt1, System.Windows.Point pnt2) : base(pnt1, pnt2)
         {
             p1c = new Point(p1.X + 50, p1.Y + 50);
@@ -24,7 +26,7 @@ namespace GK_Proj_1.Edges
 
         public override void Draw(DrawingContext dc)
         {
-            DrawingAlgorithms.DrawBezierCurve(p1, p1c, p2c, p2, dc);
+            pixels = DrawingAlgorithms.DrawBezierCurve(p1, p1c, p2c, p2, dc);
             dc.DrawLine(new Pen(Brushes.LightGray, 2), p1, p2);
             dc.DrawLine(new Pen(Brushes.LightGray, 2), p1, p1c);
             dc.DrawLine(new Pen(Brushes.LightGray, 2), p2, p2c);
@@ -97,7 +99,7 @@ namespace GK_Proj_1.Edges
 
         public bool MoveCP1To(Point pt, int edgesCount)
         {
-            if(vertType == VertRelationType.Regular)
+            if(vertType == VertRelationType.G0)
             {
                 p1c.X = pt.X;
                 p1c.Y = pt.Y;
@@ -111,7 +113,7 @@ namespace GK_Proj_1.Edges
 
         public bool MoveCP2To(Point pt, int edgesCount)
         {
-            if (vertType == VertRelationType.Regular)
+            if (vertType == VertRelationType.G0)
             {
                 p2c.X = pt.X;
                 p2c.Y = pt.Y;
@@ -121,6 +123,16 @@ namespace GK_Proj_1.Edges
             p2c.X = pt.X;
             p2c.Y = pt.Y;
             return true;
+        }
+
+        public override bool IsNearEdge(Point pt)
+        {
+            foreach((int x, int y) in pixels)
+            {
+                if (Math.Sqrt(Math.Pow(x - pt.X, 2) + Math.Pow(y - pt.Y, 2)) < 10)
+                    return true;
+            }    
+            return false;
         }
     }
 }

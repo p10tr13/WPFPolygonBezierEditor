@@ -22,7 +22,7 @@ namespace GK_Proj_1.Edges
             p1 = pnt1;
             p2 = pnt2;
             type = RelationType.Regular;
-            vertType = VertRelationType.Regular;
+            vertType = VertRelationType.G0;
         }
 
         public virtual void Draw(DrawingContext dc)
@@ -74,7 +74,7 @@ namespace GK_Proj_1.Edges
             return new Point(closeX, closeY);
         }
 
-        public bool IsNearEdge(Point pt)
+        public virtual bool IsNearEdge(Point pt)
         {
             Point closestpt = ClosestPointOnEdge(pt);
             if (closestpt.X == -1 && closestpt.Y == -1)

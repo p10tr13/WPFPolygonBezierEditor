@@ -98,13 +98,14 @@ namespace GK_Proj_1
 
         // punkty są tutaj nazywane zgodnie z literaturą nie z resztą programu
         // p0 - p3 to odpowiednio początki o końce krzywej Beziera
-        public static void DrawBezierCurve(Point p0, Point p1, Point p2, Point p3, DrawingContext dc)
+        public static List<(int x, int y)> DrawBezierCurve(Point p0, Point p1, Point p2, Point p3, DrawingContext dc)
         {
             List<(int x, int y)> pixels = BezierCubicLine((int)p0.X, (int)p0.Y,(int)p1.X, (int)p1.Y, (int)p2.X, (int)p2.Y, (int)p3.X, (int)p3.Y);
             foreach ((int x, int y) in pixels)
             {
                 dc.DrawRectangle(Var.EdgeColor, null, new System.Windows.Rect(x, y, 3, 3));
             }
+            return pixels;
         }
 
         // Alois Zingl
