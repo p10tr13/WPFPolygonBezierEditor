@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using Point = System.Windows.Point;
 
@@ -25,13 +27,47 @@ namespace GK_Proj_1.Edges
             DrawingAlgorithms.DrawBezierCurve(p1, p1c, p2c, p2, dc);
             dc.DrawLine(new Pen(Brushes.LightGray, 2), p1, p2);
             dc.DrawLine(new Pen(Brushes.LightGray, 2), p1, p1c);
-            dc.DrawLine(new Pen(Brushes.LightGray, 2), p1c, p2);
             dc.DrawLine(new Pen(Brushes.LightGray, 2), p2, p2c);
-            dc.DrawLine(new Pen(Brushes.LightGray, 2), p2c, p1);
             dc.DrawLine(new Pen(Brushes.LightGray, 2), p1c, p2c);
             dc.DrawEllipse(Var.VertColor, null, p1, Var.VertSize, Var.VertSize);
             dc.DrawEllipse(Var.VertColor, null, p1c, Var.VertSize, Var.VertSize);
             dc.DrawEllipse(Var.VertColor, null, p2c, Var.VertSize, Var.VertSize);
+            DrawG(dc);
+        }
+
+        public void DrawG(DrawingContext dc)
+        {
+            string s1, s2;
+            if (p1Edge != null)
+            {
+                if (IsCollinear(p1Edge.p1, p1Edge.p2, p1c))
+                    s1 = "G1";
+                else
+                    s1 = "G0";
+
+                FormattedText ft = new FormattedText(s1, System.Globalization.CultureInfo.InvariantCulture,
+                        FlowDirection.LeftToRight, new Typeface("Arial"), 15,
+                        Brushes.Brown, VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+                dc.DrawText(ft, new Point(p1Edge.p2.X + 10, p1Edge.p2.Y + 10));
+            }
+
+            if (p2Edge != null)
+            {
+                if (IsCollinear(p2c, p2Edge.p1, p2Edge.p2))
+                    s2 = "G1";
+                else
+                    s2 = "G0";
+
+                FormattedText ft = new FormattedText(s2, System.Globalization.CultureInfo.InvariantCulture,
+                        FlowDirection.LeftToRight, new Typeface("Arial"), 15,
+                        Brushes.Brown, VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
+                dc.DrawText(ft, new Point(p2Edge.p1.X + 10, p2Edge.p1.Y + 10));
+            }
+        }
+
+        public static bool IsCollinear(Point x1, Point x2, Point x3)
+        {
+            return Math.Abs((x2.X - x1.X) * (x3.Y - x1.Y) - (x2.Y - x1.Y) * (x3.X - x1.X)) < Var.Eps;
         }
 
         public override bool IsNearControlPoint(Point pt, out int indc)
