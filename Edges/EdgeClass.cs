@@ -12,6 +12,7 @@ namespace GK_Proj_1.Edges
     public class Edge
     {
         public RelationType type { get; set; }
+        public VertRelationType vertType { get; set; }
         public Edge? p1Edge, p2Edge;
         public Point p1;
         public Point p2;
@@ -21,6 +22,7 @@ namespace GK_Proj_1.Edges
             p1 = pnt1;
             p2 = pnt2;
             type = RelationType.Regular;
+            vertType = VertRelationType.Regular;
         }
 
         public virtual void Draw(DrawingContext dc)
@@ -102,6 +104,11 @@ namespace GK_Proj_1.Edges
             return p1Edge.AdjustP2(0, edgesCount);
         }
 
+        public virtual bool MoveCPTo(Point pt, int cpind, int edgesCount)
+        {
+            return false;
+        }
+
         public virtual bool MoveEdge(double x, double y, int edgesCount)
         {
             if(p1Edge == null || p2Edge == null)
@@ -145,6 +152,12 @@ namespace GK_Proj_1.Edges
                 middle.Y = p2.Y + (p1.Y - p2.Y) / 2;
 
             return middle;
+        }
+
+        public virtual bool IsNearControlPoint(Point pt, out int indc)
+        {
+            indc = -1;
+            return false;
         }
     }
 }

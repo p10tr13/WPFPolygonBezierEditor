@@ -27,10 +27,6 @@ namespace GK_Proj_1.Edges
 
             switch (p2Edge.type)
             {
-                case RelationType.Bezier:
-                    {
-                        return true;
-                    }
                 default:
                     {
                         Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);

@@ -14,4 +14,11 @@ namespace GK_Proj_1
         FixedLen,
         Bezier
     }
+
+    public enum VertRelationType
+    {
+        Regular,
+        G0,
+        G1
+    }
 }

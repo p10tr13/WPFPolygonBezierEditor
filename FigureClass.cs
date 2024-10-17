@@ -52,6 +52,22 @@ namespace GK_Proj_1
             return false;
         }
 
+        //Sprawdzamy czy dany punkt leży blisko punktów kontrolnych
+        public bool IsNearControlPoint(Point pt, out int indv, out int indc)
+        {
+            for (int i = 0; i < Edges.Count; i++)
+            {
+                if (Edges[i].IsNearControlPoint(pt,out indc))
+                {
+                    indv = i;
+                    return true;
+                }
+            }
+            indv = -1;
+            indc = -1;
+            return false;
+        }
+
         //Sprawdzamy czy dany punkt jest blisko którejś krawędzi
         public bool IsNearEdge(Point pt, out int ind)
         {
@@ -255,6 +271,13 @@ namespace GK_Proj_1
             if(Edges[vertind].MoveP1To(pt,Edges.Count))
                 return true;
             SimpleMove(pt.X - Edges[vertind].p1.X, pt.Y - Edges[vertind].p1.Y);
+            return false;
+        }
+
+        public bool TryMoveControlPoint(Point pt, int vertind, int controlptind) 
+        {
+            if (Edges[vertind].MoveCPTo(pt, controlptind, Edges.Count))
+                return true;
             return false;
         }
 

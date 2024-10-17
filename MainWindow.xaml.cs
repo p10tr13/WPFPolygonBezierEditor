@@ -33,10 +33,12 @@ namespace GK_Proj_1
         private Figure drawingFigure = new Figure();
         private Edge drawingAnimationEdge = null;
         private int selectedVert = -1;
+        private int selectedCVert = -1;
         private int selectedEdge = -1;
         private bool draggingFigure = false;
         private bool draggingVert = false;
         private bool draggingEdge = false;
+        private bool draggingCVert = false;
         private Point addVertPoint = new Point(0, 0);
         private Point lastMousePosition = new Point(0, 0);
 
@@ -199,6 +201,14 @@ namespace GK_Proj_1
                 return;
             }
 
+            if(draggingCVert && (lastMousePosition - pt).Length > 2) 
+            {
+                drawingFigure.TryMoveControlPoint(pt, selectedVert, selectedCVert);
+                Redraw();
+                lastMousePosition = pt;
+                return;
+            }
+
             if (draggingVert && (drawingFigure.Edges[selectedVert].p1 - pt).Length > 2)
             {
                 drawingFigure.TryMoveVert(pt, selectedVert);
@@ -257,6 +267,15 @@ namespace GK_Proj_1
                 return;
             }
 
+            if (drawingFigure.IsNearControlPoint(pt, out int indv, out int indc))
+            {
+                selectedVert = indv;
+                selectedCVert = indc;
+                draggingCVert = true;
+                lastMousePosition = pt;
+                return;
+            }
+
             if (drawingFigure.IsNearVert(pt, out int vertind))
             {
                 selectedVert = vertind;
@@ -307,6 +326,7 @@ namespace GK_Proj_1
             draggingFigure = false;
             draggingVert = false;
             draggingEdge = false;
+            draggingCVert = false;
         }
 
         private void Redraw()
