@@ -276,9 +276,7 @@ namespace GK_Proj_1
 
         public bool TryMoveControlPoint(Point pt, int vertind, int controlptind) 
         {
-            if (Edges[vertind].MoveCPTo(pt, controlptind, Edges.Count))
-                return true;
-            return false;
+            return Edges[vertind].MoveCPTo(pt, controlptind, Edges.Count);
         }
 
         public bool TryMoveEdge(double x, double y, int edgeind)
@@ -306,6 +304,18 @@ namespace GK_Proj_1
             if (ind == 0)
                 p = Edges.Count - 1;
             return (type == RelationType.Regular || type == RelationType.FixedLen || type == RelationType.Bezier || (Edges[n].type != type && type != Edges[p].type));
+        }
+
+        public void AdjustFigureToVertRelation(int vertind)
+        {
+            if (Edges[vertind].type == RelationType.Bezier)
+            {
+                Edges[vertind].AdjustCP1();
+                return;
+            }
+            if (Edges[vertind].p1Edge.type == RelationType.Bezier)
+                Edges[vertind].p1Edge.AdjustCP2();
+            return;
         }
     }
 }

@@ -28,6 +28,7 @@ namespace GK_Proj_1
             Var.DrawingStyle = DrawingStyle.Windows;
         }
 
+        // Zmienne
         private ContextMenu vertContextMenu, edgeContextMenu;
         private bool drawing = false;
         private Figure drawingFigure = new Figure();
@@ -42,12 +43,24 @@ namespace GK_Proj_1
         private Point addVertPoint = new Point(0, 0);
         private Point lastMousePosition = new Point(0, 0);
 
+        [DllImport("User32.dll")]
+        private static extern bool SetCursorPos(int X, int Y);
+
         private void InitializeVertContextMenu()
         {
             vertContextMenu = new ContextMenu();
-            MenuItem deleteMenuItem = new MenuItem { Header = "정점을 제거" };
+
+            MenuItem deleteMenuItem = new MenuItem { Header = "Delete vertex" };
             deleteMenuItem.Click += DeleteMenuItemClick;
             vertContextMenu.Items.Add(deleteMenuItem);
+
+            MenuItem g0MenuItem = new MenuItem { Header = "G0" };
+            g0MenuItem.Click += G0MenuItemClick;
+            vertContextMenu.Items.Add(g0MenuItem);
+
+            MenuItem g1MenuItem = new MenuItem { Header = "G1" };
+            g1MenuItem.Click += G1MenuItemClick;
+            vertContextMenu.Items.Add(g1MenuItem);
         }
 
         private void InitializeEdgeContextMenu()
@@ -108,6 +121,31 @@ namespace GK_Proj_1
             drawingFigure.UpdateRelation(selectedVert - 1);
             Redraw();
             return;
+        }
+
+        private void G0MenuItemClick(object sender, EventArgs e)
+        {
+            drawingFigure.Edges[selectedVert].vertType = VertRelationType.G0;
+            return;
+        }
+
+        private void G1MenuItemClick(object sender, EventArgs e)
+        {
+            if (drawingFigure.Edges[selectedVert].vertType == VertRelationType.G1)
+                return;
+
+            int prevVert = -1;
+            if (selectedVert == 0)
+                prevVert = drawingFigure.Edges.Count - 1;
+            else
+                prevVert = selectedVert - 1;
+
+            if (drawingFigure.Edges[selectedVert].type != RelationType.Bezier && drawingFigure.Edges[prevVert].type != RelationType.Bezier)
+                return;
+
+            drawingFigure.Edges[selectedVert].vertType = VertRelationType.G1;
+            drawingFigure.AdjustFigureToVertRelation(selectedVert);
+            Redraw();
         }
 
         private void AddVertexItemClick(object sender, RoutedEventArgs e)
@@ -203,8 +241,8 @@ namespace GK_Proj_1
 
             if(draggingCVert && (lastMousePosition - pt).Length > 2) 
             {
-                drawingFigure.TryMoveControlPoint(pt, selectedVert, selectedCVert);
-                Redraw();
+                if(drawingFigure.TryMoveControlPoint(pt, selectedVert, selectedCVert))
+                    Redraw();
                 lastMousePosition = pt;
                 return;
             }

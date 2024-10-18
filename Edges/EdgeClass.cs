@@ -159,5 +159,18 @@ namespace GK_Proj_1.Edges
             indc = -1;
             return false;
         }
+
+        public virtual void AdjustCP1() {}
+
+        public virtual void AdjustCP2() {}
+
+        // Podajemy z którym wierzchołkiem jest połączony bezpośrednio ten wierzchołek
+        public virtual (Point p1,  Point p2) GetCollinearPoints(int vert)
+        {
+            if(vert == 2)
+                return (p1, p2);
+            else
+                return (p2, p1);
+        }
     }
 }
