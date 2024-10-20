@@ -101,6 +101,21 @@ namespace GK_Proj_1.Edges
             return false;
         }
 
+        public override bool MoveP1To(Point pt, int edgesCount)
+        {
+            if (p1Edge == null || p2Edge == null)
+                return false;
+            bool res = false;
+            Point p1old = p1;
+            p1 = pt;
+            if (p2Edge.vertType == VertRelationType.G1)
+                p2Edge.AdjustCP1(0, 0);
+            res = p1Edge.AdjustP2(0, edgesCount);
+            if (res && vertType == VertRelationType.G1)
+                AdjustCP1(p1.X - p1old.X, p1.Y - p1old.Y);
+            return res;
+        }
+
         public override void AdjustCP1(double dx, double dy)
         {
             (Point pt1, Point pt2) = p1Edge.GetCollinearPoints(2);

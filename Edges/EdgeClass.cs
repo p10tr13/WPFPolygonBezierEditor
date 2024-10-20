@@ -300,7 +300,7 @@ namespace GK_Proj_1.Edges
                     }
                 default:
                     {
-                        Point p1new = Geometry.FindIntersection(p1s, p2s, p2Edge.p1, p1Edge.p2);
+                        Point p1new = Geometry.FindIntersection(p1s, p2s, p1Edge.p1, p1Edge.p2);
                         if (p1new.X == -1 && p1new.Y == -1)
                             return false;
                         p1 = p1new;

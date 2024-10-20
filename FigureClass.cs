@@ -288,7 +288,17 @@ namespace GK_Proj_1
 
         public bool TryMoveControlPoint(Point pt, int vertind, int controlptind) 
         {
-            return Edges[vertind].MoveCPTo(pt, controlptind, Edges.Count);
+            if(Edges[vertind].MoveCPTo(pt, controlptind, Edges.Count))
+                return true;
+            if (Edges[vertind].type == RelationType.Bezier)
+            {
+                BezierEdge bed = Edges[vertind] as BezierEdge;
+                if (controlptind == 1)
+                    SimpleMove(pt.X - bed.p1c.X, pt.Y - bed.p1c.Y);
+                else
+                    SimpleMove(pt.X - bed.p2c.X, pt.Y - bed.p2c.Y);
+            }
+            return false;
         }
 
         public bool TryMoveEdge(double x, double y, int edgeind)
