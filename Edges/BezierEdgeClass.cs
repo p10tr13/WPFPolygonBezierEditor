@@ -76,21 +76,6 @@ namespace GK_Proj_1.Edges
             }
         }
 
-        public static bool IsCollinear(Point x1, Point x2, Point x3)
-        {
-            return Math.Abs((x2.X - x1.X) * (x3.Y - x1.Y) - (x2.Y - x1.Y) * (x3.X - x1.X)) < Var.Eps;
-        }
-
-        public static Point MovePointToBeCollinear(Point x1, Point x2, Point x3)
-        {
-            double dx = x2.X - x1.X;
-            double dy = x2.Y - x1.Y;
-
-            double t = ((x3.X - x1.X) * dx + (x3.Y - x1.Y) * dy) / (Math.Pow(dx, 2) + Math.Pow(dy, 2));
-
-            return new Point(x1.X + dx * t, x1.Y + dy * t);
-        }
-
         public override bool IsNearControlPoint(Point pt, out int indc)
         {
             if ((p1c - pt).Length < 10)
@@ -116,41 +101,153 @@ namespace GK_Proj_1.Edges
             return false;
         }
 
-        public override void AdjustCP1()
+        public override void AdjustCP1(double dx, double dy)
         {
             (Point pt1, Point pt2) = p1Edge.GetCollinearPoints(2);
-            p1c = MovePointToBeCollinear(pt1, pt2, p1c);
+            p1c.X += dx;
+            p1c.Y += dy;
+            if (vertType == VertRelationType.G1)
+                p1c = Geometry.MovePointToBeCollinear(pt1, pt2, p1c);
         }
 
-        public override void AdjustCP2() 
+        public override void AdjustCP2(double dx, double dy) 
         {
             (Point pt1, Point pt2) = p2Edge.GetCollinearPoints(1);
-            p2c = MovePointToBeCollinear(pt1, pt2, p2c);
+            p2c.X += dx;
+            p2c.Y += dy;
+            if (p2Edge.vertType == VertRelationType.G1)
+                p2c = Geometry.MovePointToBeCollinear(pt1, pt2, p2c);
+        }
+
+        public override bool AdjustP1(int ind, int maxRecCount)
+        {
+            if (p1Edge == null)
+                return false;
+            double dx = p1Edge.p2.X - p1.X, dy = p1Edge.p2.Y - p1.Y;
+
+            if (Geometry.doIntersect(p1, p2, p1c, p2c))
+            {
+                p1 = p1Edge.p2;
+                AdjustCP1(dx, dy);
+                AdjustCP2(-dx, -dy);
+            }
+            else
+            {
+                p1 = p1Edge.p2;
+                AdjustCP1(dx, dy);
+                AdjustCP2(dx, dy);
+            }
+
+            return true;
+        }
+
+        public override bool AdjustP2(int ind, int maxRecCount)
+        {
+            if (p2Edge == null)
+                return false;
+            double dx = p2Edge.p1.X - p2.X, dy = p2Edge.p1.Y - p2.Y;
+
+            if (Geometry.doIntersect(p1, p2, p1c, p2c))
+            {
+                p2 = p2Edge.p1;
+                AdjustCP1(-dx,-dy);
+                AdjustCP2(dx, dy);
+            }
+            else
+            {
+                p2 = p2Edge.p1;
+                AdjustCP1(dx, dy);
+                AdjustCP2(dx, dy);
+            }
+
+            return true;
         }
 
         public bool MoveCP1To(Point pt, int edgesCount)
         {
+            Point p1cold = p1c;
             p1c.X = pt.X;
             p1c.Y = pt.Y;
             if (vertType == VertRelationType.G0)
                 return true;
             (Point pt1, Point pt2) = p1Edge.GetCollinearPoints(2);
-            if (IsCollinear(pt1, pt2, p1c))
+            if (Geometry.IsCollinear(pt1, pt2, p1c) || (p1c - p1).Length < 2)
                 return true;
-            return true;
+            bool res = false;
+            switch (p1Edge.type)
+            {
+                case RelationType.Horizontal:
+                    {
+                        p1.Y = pt.Y;
+                        res = p1Edge.AdjustP2(1, edgesCount);
+                        break;
+                    }
+                case RelationType.Vertical:
+                    {
+                        p1.X = pt.X;
+                        res = p1Edge.AdjustP2(1, edgesCount);
+                        break;
+                    }
+                case RelationType.Bezier:
+                    {
+                        p1Edge.AdjustCP2(0,0);
+                        res = true;
+                        break;
+                    }
+                default:
+                    {
+                        res = p1Edge.MakeCollinearToP2(1, edgesCount);
+                        break;
+                    }
+            }
+            if (!res)
+            {
+                p1c = p1cold;
+            }
+            return res;
         }
 
         public bool MoveCP2To(Point pt, int edgesCount)
         {
+            Point p2cold = p2c;
             p2c.X = pt.X;
             p2c.Y = pt.Y;
             if (p2Edge.vertType == VertRelationType.G0)
                 return true;
             (Point pt1, Point pt2) = p2Edge.GetCollinearPoints(1);
-            if (IsCollinear(pt1, pt2, p2c))
+            if (Geometry.IsCollinear(pt1, pt2, p2c) || (p2c - p2).Length < 2)
                 return true;
-            
-            return true;
+            bool res = false;
+            switch (p2Edge.type)
+            {
+                case RelationType.Horizontal:
+                    {
+                        p2.Y = pt.Y;
+                        res = p2Edge.AdjustP1(1, edgesCount);
+                        break;
+                    }
+                case RelationType.Vertical:
+                    {
+                        p2.X = pt.X;
+                        res = p2Edge.AdjustP1(1, edgesCount);
+                        break;
+                    }
+                case RelationType.Bezier:
+                    {
+                        p2Edge.AdjustCP1(0, 0);
+                        break;
+                    }
+                default:
+                    {
+                        res = p2Edge.MakeCollinearToP1(1, edgesCount);
+                        break;
+                    }
+            }
+            if(!res)
+            {
+                p2c = p2cold;
+            }
+            return res;
         }
 
         public override bool IsNearEdge(Point pt)

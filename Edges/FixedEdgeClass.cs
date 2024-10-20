@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
 using Point = System.Windows.Point;
+using System.Windows.Documents;
 
 namespace GK_Proj_1.Edges
 {
@@ -43,7 +44,7 @@ namespace GK_Proj_1.Edges
                 return false;
             if (ind == maxRecCount)
                 return false;
-
+            bool res = false;
             Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
 
             if (p1Edge.type == RelationType.Vertical)
@@ -59,7 +60,8 @@ namespace GK_Proj_1.Edges
                         else
                             p1.Y = p2.Y + z;
                         p1Edge.p2.Y = p1.Y;
-                        return true;
+                        res = true;
+                        goto AdjustingCP1;
                     }
                 }
                 else
@@ -102,7 +104,8 @@ namespace GK_Proj_1.Edges
                             p1Edge.p2.X = p2.X - z;
                         p1.X = p1Edge.p2.X;
                         p1.Y = p1Edge.p2.Y;
-                        return true;
+                        res = true;
+                        goto AdjustingCP1;
                     }
                 }
             }
@@ -112,7 +115,12 @@ namespace GK_Proj_1.Edges
             p2 = CalculateOtherPointsPosition(p1, p2);
 
         Exit:
-            bool res = p2Edge.AdjustP1(++ind, maxRecCount);
+            res = p2Edge.AdjustP1(++ind, maxRecCount);
+
+        AdjustingCP1:
+            if (res && p2Edge.vertType == VertRelationType.G1)
+                p2Edge.AdjustCP1(0, 0);
+
             if (!res)
             {
                 p1 = oldp1;
@@ -129,6 +137,7 @@ namespace GK_Proj_1.Edges
                 return false;
 
             Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
+            bool res = false;
 
             if (p2Edge.type == RelationType.Vertical)
             {
@@ -143,7 +152,8 @@ namespace GK_Proj_1.Edges
                         else
                             p2.Y = p1.Y + z;
                         p2Edge.p1.Y = p2.Y;
-                        return true;
+                        res = true;
+                        goto AdjustingCP2;
                     }
                 }
                 else
@@ -157,8 +167,6 @@ namespace GK_Proj_1.Edges
                         p2.X = p2Edge.p1.X;
                         p2.Y = p2Edge.p1.Y;
                         p1.Y = p2.Y;
-
-                        //Temporary
                         goto Exit;
                     }
                 }
@@ -191,7 +199,8 @@ namespace GK_Proj_1.Edges
                             p2Edge.p1.X = p1.X - z;
                         p2.X = p2Edge.p1.X;
                         p2.Y = p2Edge.p1.Y;
-                        return true;
+                        res = true;
+                        goto AdjustingCP2;
                     }
                 }
             }
@@ -201,7 +210,10 @@ namespace GK_Proj_1.Edges
             p1 = CalculateOtherPointsPosition(p2, p1);
 
         Exit:
-            bool res = p1Edge.AdjustP2(++ind, maxRecCount);
+            res = p1Edge.AdjustP2(++ind, maxRecCount);
+        AdjustingCP2:
+            if (res && vertType == VertRelationType.G1)
+                p1Edge.AdjustCP2(0, 0);
             if (!res)
             {
                 p1 = oldp1;
@@ -226,10 +238,60 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
+        public override bool MakeCollinearToP1(int ind, int edgesCount)
+        {
+            bool res = false;
+            Point p1old = new Point(p1.X, p1.Y), p2old = new Point(p2.X, p2.Y);
+            (Point p1s, Point p2s) = p1Edge.GetCollinearPoints(2);
+
+            double dx = p2s.X - p1s.X;
+            double dy = p2s.Y - p1s.Y;
+            double len = Math.Sqrt(dx * dx + dy * dy);
+            double uX = dx / len;
+            double uY = dy / len;
+            p2.X = p1.X + uX * length;
+            p2.Y = p1.Y + uY * length;
+
+            res = p2Edge.AdjustP1(++ind, edgesCount);
+
+            if (!res)
+            {
+                p1 = p1old;
+                p2 = p2old;
+            }
+
+            return res;
+        }
+
+        public override bool MakeCollinearToP2(int ind, int edgesCount)
+        {
+            bool res = false;
+            Point p1old = new Point(p1.X, p1.Y), p2old = new Point(p2.X, p2.Y);
+            (Point p1s, Point p2s) = p2Edge.GetCollinearPoints(1);
+
+            double dx = p2s.X - p1s.X;
+            double dy = p2s.Y - p1s.Y;
+            double len = Math.Sqrt(dx * dx + dy * dy);
+            double uX = dx / len;
+            double uY = dy / len;
+            p1.X = p2.X + uX * length;
+            p1.Y = p2.Y + uY * length;
+
+            res = p1Edge.AdjustP2(++ind, edgesCount);
+
+            if (!res)
+            {
+                p1 = p1old;
+                p2 = p2old;
+            }
+
+            return res;
+        }
+
         public override void Draw(DrawingContext dc)
         {
             base.Draw(dc);
-            Point middle = GetMiddle();
+            Point middle = Geometry.GetMiddle(p1, p2);
             middle.Y -= 20;
             FormattedText ft = new FormattedText(Math.Round(length, 2).ToString(), System.Globalization.CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight, new Typeface("Arial"), 20,

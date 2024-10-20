@@ -97,7 +97,7 @@ namespace GK_Proj_1.Edges
         public override void Draw(DrawingContext dc)
         {
             base.Draw(dc);
-            Point middle = GetMiddle();
+            Point middle = Geometry.GetMiddle(p1, p2);
             middle.X -= 20;
             FormattedText ft = new FormattedText("|", System.Globalization.CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight, new Typeface("Arial"), 20,

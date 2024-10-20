@@ -217,6 +217,12 @@ namespace GK_Proj_1
             {
                 ed.p1.Y += y;
                 ed.p2.Y += y;
+                if (ed.type == RelationType.Bezier)
+                {
+                    BezierEdge bed = ed as BezierEdge;
+                    bed.p1c.Y += y;
+                    bed.p2c.Y += y;
+                }
             }
         }
 
@@ -226,6 +232,12 @@ namespace GK_Proj_1
             {
                 ed.p1.X += x;
                 ed.p2.X += x;
+                if (ed.type == RelationType.Bezier)
+                {
+                    BezierEdge bed = ed as BezierEdge;
+                    bed.p1c.X += x;
+                    bed.p2c.X += x;
+                }
             }
         }
 
@@ -310,11 +322,11 @@ namespace GK_Proj_1
         {
             if (Edges[vertind].type == RelationType.Bezier)
             {
-                Edges[vertind].AdjustCP1();
+                Edges[vertind].AdjustCP1(0,0);
                 return;
             }
             if (Edges[vertind].p1Edge.type == RelationType.Bezier)
-                Edges[vertind].p1Edge.AdjustCP2();
+                Edges[vertind].p1Edge.AdjustCP2(0,0);
             return;
         }
     }

@@ -43,9 +43,6 @@ namespace GK_Proj_1
         private Point addVertPoint = new Point(0, 0);
         private Point lastMousePosition = new Point(0, 0);
 
-        [DllImport("User32.dll")]
-        private static extern bool SetCursorPos(int X, int Y);
-
         private void InitializeVertContextMenu()
         {
             vertContextMenu = new ContextMenu();
@@ -126,6 +123,7 @@ namespace GK_Proj_1
         private void G0MenuItemClick(object sender, EventArgs e)
         {
             drawingFigure.Edges[selectedVert].vertType = VertRelationType.G0;
+            Redraw();
             return;
         }
 
@@ -165,6 +163,7 @@ namespace GK_Proj_1
             HorizontalEdge hed = new HorizontalEdge(ed.p1,ed.p2);
             drawingFigure.Edges.RemoveAt(selectedEdge);
             drawingFigure.AddEdgeAt(selectedEdge, hed);
+            hed.vertType = ed.vertType; 
             hed.p1Edge.AdjustP2(0, drawingFigure.Edges.Count);
             hed.p2Edge.AdjustP1(1, drawingFigure.Edges.Count);
             Redraw();
@@ -178,6 +177,7 @@ namespace GK_Proj_1
             VerticalEdge ved = new VerticalEdge(ed.p1, ed.p2);
             drawingFigure.Edges.RemoveAt(selectedEdge);
             drawingFigure.AddEdgeAt(selectedEdge, ved);
+            ved.vertType = ed.vertType;
             ved.p1Edge.AdjustP2(1, drawingFigure.Edges.Count);
             ved.p2Edge.AdjustP1(1, drawingFigure.Edges.Count);
             Redraw();
@@ -187,6 +187,7 @@ namespace GK_Proj_1
         {
             Edge ed = drawingFigure.Edges[selectedEdge];
             FixedLenEdge fix = new FixedLenEdge(ed.p1, ed.p2);
+            fix.vertType = ed.vertType;
             drawingFigure.Edges.RemoveAt(selectedEdge);
             drawingFigure.AddEdgeAt(selectedEdge, fix);
             Redraw();
@@ -211,6 +212,8 @@ namespace GK_Proj_1
             Edge ed = new Edge(edToDel.p1, edToDel.p2);
             drawingFigure.Edges.RemoveAt(selectedEdge);
             drawingFigure.AddEdgeAt(selectedEdge, ed);
+            if (ed.p2Edge.type != RelationType.Bezier)
+                ed.p2Edge.vertType = VertRelationType.G0;
             Redraw();
         }
 

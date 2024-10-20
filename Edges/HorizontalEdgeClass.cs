@@ -16,7 +16,7 @@ namespace GK_Proj_1.Edges
 
         public override bool AdjustP1(int ind, int maxRecCount)
         {
-            if (p1Edge == null)
+            if (p1Edge == null || p2Edge == null)
                 return false;
             if (p1.Y == p1Edge.p2.Y)
             {
@@ -48,7 +48,7 @@ namespace GK_Proj_1.Edges
 
         public override bool AdjustP2(int ind, int maxRecCount)
         {
-            if (p2Edge == null)
+            if (p2Edge == null || p1Edge == null)
                 return false;
             if (p1.Y == p2Edge.p1.Y)
             {
@@ -98,7 +98,7 @@ namespace GK_Proj_1.Edges
         public override void Draw(DrawingContext dc)
         {
             base.Draw(dc);
-            Point middle = GetMiddle();
+            Point middle = Geometry.GetMiddle(p1,p2);
             middle.Y -= 20;
             FormattedText ft = new FormattedText( "<->", System.Globalization.CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight, new Typeface("Arial"), 20,
