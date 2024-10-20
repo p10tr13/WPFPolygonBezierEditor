@@ -204,6 +204,19 @@ namespace GK_Proj_1.Edges
                         res = true;
                         break;
                     }
+                case RelationType.Horizontal:
+                    {
+                        if(Math.Abs(p2s.X - p1s.X) < Var.Eps)
+                            { res = false; break; }
+                        double a = (p2s.Y - p1s.Y) / (p2s.X - p1s.X);
+                        double b = p1s.Y - a * p1s.X;
+                        double x3 = (p2Edge.p1.Y - b)/a;
+                        p2.Y = p2Edge.p1.Y;
+                        p2.X = x3;
+                        p2Edge.p1.X = x3;
+                        res = true;
+                        break;
+                    }
                 default:
                     {
                         Point p2new = Geometry.FindIntersection(p1s, p2s, p2Edge.p1, p2Edge.p2);
@@ -269,6 +282,19 @@ namespace GK_Proj_1.Edges
                         p1.X = p1Edge.p2.X;
                         p1.Y = y3;
                         p1Edge.p2.Y = y3;
+                        res = true;
+                        break;
+                    }
+                case RelationType.Horizontal:
+                    {
+                        if (Math.Abs(p2s.X - p1s.X) < Var.Eps)
+                        { res = false; break; }
+                        double a = (p2s.Y - p1s.Y) / (p2s.X - p1s.X);
+                        double b = p1s.Y - a * p1s.X;
+                        double x3 = (p1Edge.p2.Y - b) / a;
+                        p1.Y = p1Edge.p2.Y;
+                        p1.X = x3;
+                        p1Edge.p2.X = x3;
                         res = true;
                         break;
                     }
