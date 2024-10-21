@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Point = System.Windows.Point;
@@ -126,6 +127,12 @@ namespace GK_Proj_1
             double closeX = p1.X + t * (p2.X - p1.X);
             double closeY = p1.Y + t * (p2.Y - p1.Y);
             return new Point(closeX, closeY);
+        }
+
+        // Sprawdza czy współliniowe punkty p1,p2,p3 mają p1 i p3 po przeciwnej stronie od p2
+        public static bool OnTheSameSideofP2(Point p1, Point p2, Point p3)
+        {
+            return ((p2.X - p1.X) * (p3.X - p2.X) + (p2.Y - p1.Y) * (p3.Y - p2.Y)) < 0;
         }
     }
 }

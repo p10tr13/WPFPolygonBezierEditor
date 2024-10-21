@@ -18,6 +18,7 @@ namespace GK_Proj_1
     public enum VertRelationType
     {
         G0,
-        G1
+        G1,
+        C1
     }
 }

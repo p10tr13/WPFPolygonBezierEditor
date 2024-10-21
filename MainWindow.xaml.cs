@@ -65,6 +65,10 @@ namespace GK_Proj_1
             MenuItem g1MenuItem = new MenuItem { Header = "G1" };
             g1MenuItem.Click += G1MenuItemClick;
             vertContextMenu.Items.Add(g1MenuItem);
+
+            MenuItem c1MenuItem = new MenuItem { Header = "C1" };
+            c1MenuItem.Click += C1MenuItemClick;
+            vertContextMenu.Items.Add(c1MenuItem);
         }
 
         // Tworzenie menu contextowego dla kliknięcia krawędzi
@@ -157,6 +161,26 @@ namespace GK_Proj_1
             Redraw();
         }
 
+        // Zmiana rodzaju wierzchołka na C1, tylko gdy jest przy Bezierze
+        private void C1MenuItemClick(object sender, EventArgs e)
+        {
+            if (drawingFigure.Edges[selectedVert].vertType == VertRelationType.C1)
+                return;
+
+            int prevVert = -1;
+            if (selectedVert == 0)
+                prevVert = drawingFigure.Edges.Count - 1;
+            else
+                prevVert = selectedVert - 1;
+
+            if (drawingFigure.Edges[selectedVert].type != RelationType.Bezier && drawingFigure.Edges[prevVert].type != RelationType.Bezier)
+                return;
+
+            drawingFigure.Edges[selectedVert].vertType = VertRelationType.C1;
+            drawingFigure.AdjustFigureToVertRelation(selectedVert);
+            Redraw();
+        }
+
         // Dodanie nowego wierzchołka
         private void AddVertexItemClick(object sender, RoutedEventArgs e)
         {
@@ -218,6 +242,10 @@ namespace GK_Proj_1
             drawingFigure.AddEdgeAt(selectedEdge, bed);
             bed.p1Edge.AdjustP2(1, drawingFigure.Edges.Count);
             bed.p2Edge.AdjustP1(1, drawingFigure.Edges.Count);
+            bed.vertType = VertRelationType.G1;
+            bed.p2Edge.vertType = VertRelationType.G1;
+            bed.AdjustCP1(0, 0);
+            bed.AdjustCP2(0, 0);
             Redraw();
         }
 

@@ -20,9 +20,9 @@ namespace GK_Proj_1.Edges
 
         public BezierEdge(Point pnt1, Point pnt2) : base(pnt1, pnt2)
         {
-            // Wybrane ich początkowe pozycje to romb
+            // Wybrane ich początkowe pozycje to romb (nie ma to teraz znazenia, bo i tak zmieniamy ich pozycje dla G1)
             p1c = new Point((2 * p1.X + 2 * p2.X - p2.Y + p1.Y) / 4, (2 * p1.Y + 2 * p2.Y + p2.X - p1.X) / 4);
-            p2c = new Point((2 * p1.X + 2 * p2.X + p2.Y - p1.Y) / 4, (2 * p1.Y + 2 * p2.Y - p2.X + p1.X) / 4);
+            p2c = new Point((2 * p1.X + 2 * p2.X - p2.Y + p1.Y) / 4, (2 * p1.Y + 2 * p2.Y - p2.X + p1.X) / 4);
             type = RelationType.Bezier;
         }
 
@@ -44,10 +44,10 @@ namespace GK_Proj_1.Edges
             if (vert == 1)
                 return (p1c, p1);
             else
-                return (p2c, p2);   
+                return (p2c, p2);
         }
 
-        // Funkcja wypisuje odpowiednie G0/G1 przy wierzchołku
+        // Funkcja wypisuje odpowiednie G0/G1/C1 przy wierzchołku
         public void DrawG(DrawingContext dc)
         {
             string s1, s2;
@@ -55,6 +55,8 @@ namespace GK_Proj_1.Edges
             {
                 if (vertType == VertRelationType.G1)
                     s1 = "G1";
+                else if (vertType == VertRelationType.C1)
+                    s1 = "C1";
                 else
                     s1 = "G0";
 
@@ -68,6 +70,8 @@ namespace GK_Proj_1.Edges
             {
                 if (p2Edge.vertType == VertRelationType.G1)
                     s2 = "G1";
+                else if (vertType == VertRelationType.C1)
+                    s2 = "C1";
                 else
                     s2 = "G0";
 
@@ -126,16 +130,50 @@ namespace GK_Proj_1.Edges
             p1c.X += dx;
             p1c.Y += dy;
             if (vertType == VertRelationType.G1)
+            {
                 p1c = Geometry.MovePointToBeCollinear(pt1, pt2, p1c);
+                if (Geometry.OnTheSameSideofP2(pt1, pt2, p1c))
+                {
+                    dx = pt2.X - p1c.X;
+                    dy = pt2.Y - p1c.Y;
+                    p1c.X += 2 * dx;
+                    p1c.Y += 2 * dy;
+                }
+            }
+            else if (vertType == VertRelationType.C1)
+            {
+                p1c = Geometry.MovePointToBeCollinear(pt1, pt2, p1c);
+                dx = pt2.X - pt1.X;
+                dy = pt2.Y - pt1.Y;
+                p1c.X = pt2.X + dx;
+                p1c.Y = pt2.Y + dy;
+            }
         }
 
-        public override void AdjustCP2(double dx, double dy) 
+        public override void AdjustCP2(double dx, double dy)
         {
             (Point pt1, Point pt2) = p2Edge.GetCollinearPoints(1);
             p2c.X += dx;
             p2c.Y += dy;
             if (p2Edge.vertType == VertRelationType.G1)
+            {
                 p2c = Geometry.MovePointToBeCollinear(pt1, pt2, p2c);
+                if (Geometry.OnTheSameSideofP2(pt1, pt2, p2c))
+                {
+                    dx = pt2.X - p2c.X;
+                    dy = pt2.Y - p2c.Y;
+                    p2c.X += 2 * dx;
+                    p2c.Y += 2 * dy;
+                }
+            }
+            else if (vertType == VertRelationType.C1)
+            {
+                p2c = Geometry.MovePointToBeCollinear(pt1, pt2, p2c);
+                dx = pt2.X - pt1.X;
+                dy = pt2.Y - pt1.Y;
+                p2c.X = pt2.X + dx;
+                p2c.Y = pt2.Y + dy;
+            }
         }
 
         public override bool AdjustP1(int ind, int maxRecCount)
@@ -169,7 +207,7 @@ namespace GK_Proj_1.Edges
             if (Geometry.Intersect(p1, p2, p1c, p2c))
             {
                 p2 = p2Edge.p1;
-                AdjustCP1(-dx,-dy);
+                AdjustCP1(-dx, -dy);
                 AdjustCP2(dx, dy);
             }
             else
@@ -210,7 +248,7 @@ namespace GK_Proj_1.Edges
                     }
                 case RelationType.Bezier:
                     {
-                        p1Edge.AdjustCP2(0,0);
+                        p1Edge.AdjustCP2(0, 0);
                         res = true;
                         break;
                     }
@@ -236,7 +274,7 @@ namespace GK_Proj_1.Edges
             if (p2Edge.vertType == VertRelationType.G0)
                 return true;
             (Point pt1, Point pt2) = p2Edge.GetCollinearPoints(1);
-            if (Geometry.IsCollinear(pt1, pt2, p2c) || (p2c - p2).Length < 2)
+            if (Geometry.IsCollinear(pt1, pt2, pt) || (pt - p2).Length < 2)
                 return true;
             bool res = false;
             switch (p2Edge.type)
@@ -256,6 +294,7 @@ namespace GK_Proj_1.Edges
                 case RelationType.Bezier:
                     {
                         p2Edge.AdjustCP1(0, 0);
+                        res = true;
                         break;
                     }
                 default:
@@ -264,7 +303,7 @@ namespace GK_Proj_1.Edges
                         break;
                     }
             }
-            if(!res)
+            if (!res)
             {
                 p2c = p2cold;
             }

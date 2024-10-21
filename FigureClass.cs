@@ -83,7 +83,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        // Sprawdzamy czy punkt jest w środku wielokąta
+        // Sprawdzamy czy punkt jest w środku wielokąta(nie uwzględnia krzywych beziera)
         public bool IsPointInside(Point pt)
         {
             double x = pt.X, y = pt.Y;
@@ -201,6 +201,7 @@ namespace GK_Proj_1
                     SimpleMove(pt.X - bed.p1c.X, pt.Y - bed.p1c.Y);
                 else
                     SimpleMove(pt.X - bed.p2c.X, pt.Y - bed.p2c.Y);
+                return true;
             }
             return false;
         }

@@ -87,7 +87,7 @@ namespace GK_Proj_1.Edges
             if (p1Edge == null || p2Edge == null)
                 return false;
             p1 = p1Edge.p2;
-            if (p2Edge.vertType == VertRelationType.G1)
+            if (p2Edge.vertType == VertRelationType.G1 || p2Edge.vertType == VertRelationType.C1)
                 p2Edge.AdjustCP1(0,0);
             return true;
         }
@@ -98,7 +98,7 @@ namespace GK_Proj_1.Edges
             if (p2Edge == null || p1Edge == null)
                 return false;
             p2 = p2Edge.p1;
-            if (vertType == VertRelationType.G1)
+            if (vertType == VertRelationType.G1 || vertType == VertRelationType.C1)
                 p1Edge.AdjustCP2(0,0);
             return true;
         }
@@ -109,7 +109,7 @@ namespace GK_Proj_1.Edges
             if (p1Edge == null || p2Edge == null)
                 return false;
             p1 = pt;
-            if (p2Edge.vertType == VertRelationType.G1)
+            if (p2Edge.vertType == VertRelationType.G1 || p2Edge.vertType == VertRelationType.C1)
                 p2Edge.AdjustCP1(0,0);
             return p1Edge.AdjustP2(0, edgesCount);
         }

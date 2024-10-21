@@ -117,7 +117,7 @@ namespace GK_Proj_1.Edges
 
         // W razie zmiany kierunku krawędzi sprawdzamy czy trzeba control point następnej zmienić
         AdjustingCP1:
-            if (res && p2Edge.vertType == VertRelationType.G1)
+            if (res && p2Edge.vertType != VertRelationType.G0)
                 p2Edge.AdjustCP1(0, 0);
 
             if (!res)
@@ -211,7 +211,7 @@ namespace GK_Proj_1.Edges
         Exit:
             res = p1Edge.AdjustP2(++ind, maxRecCount);
         AdjustingCP2:
-            if (res && vertType == VertRelationType.G1)
+            if (res && vertType != VertRelationType.G0)
                 p1Edge.AdjustCP2(0, 0);
             if (!res)
             {
