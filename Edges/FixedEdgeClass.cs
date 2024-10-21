@@ -73,8 +73,6 @@ namespace GK_Proj_1.Edges
                     p1.X = p1Edge.p2.X;
                     p1.Y = p1Edge.p2.Y;
                     p2.Y = p1.Y;
-
-                    //Temporary
                     goto Exit;
                 }
             }
@@ -117,6 +115,7 @@ namespace GK_Proj_1.Edges
         Exit:
             res = p2Edge.AdjustP1(++ind, maxRecCount);
 
+        // W razie zmiany kierunku krawędzi sprawdzamy czy trzeba control point następnej zmienić
         AdjustingCP1:
             if (res && p2Edge.vertType == VertRelationType.G1)
                 p2Edge.AdjustCP1(0, 0);
@@ -222,6 +221,7 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
+        // Dopasowywujemy pozycję p2, tak aby był w odpowiedniej odległosci od p1 i ją zwracamy
         private Point CalculateOtherPointsPosition(Point p1, Point p2)
         {
             Point res = new Point();

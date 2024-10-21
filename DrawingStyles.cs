@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace GK_Proj_1
 {
+    // Sposób rysowania krawędzi
     public enum DrawingStyle
     {
         Windows,

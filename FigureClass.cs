@@ -37,7 +37,7 @@ namespace GK_Proj_1
             }
         }
 
-        //Sprawdzamy czy dany punkt jest blisko któregoś wierzchołka (numeracja po pierwszych wierzchołkach listy krawędzi)
+        // Sprawdzamy czy dany punkt jest blisko któregoś wierzchołka (numeracja po pierwszych wierzchołkach listy krawędzi)
         public bool IsNearVert(Point pt, out int ind)
         {
             for (int i = 0; i < Edges.Count; i++)
@@ -52,7 +52,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        //Sprawdzamy czy dany punkt leży blisko punktów kontrolnych
+        // Sprawdzamy czy dany punkt leży blisko punktów kontrolnych
         public bool IsNearControlPoint(Point pt, out int indv, out int indc)
         {
             for (int i = 0; i < Edges.Count; i++)
@@ -68,7 +68,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        //Sprawdzamy czy dany punkt jest blisko którejś krawędzi
+        // Sprawdzamy czy dany punkt jest blisko którejś krawędzi
         public bool IsNearEdge(Point pt, out int ind)
         {
             for (int i = 0; i < Edges.Count; i++)
@@ -83,7 +83,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        //Sprawdzamy czy punkt jest w środku wielokąta
+        // Sprawdzamy czy punkt jest w środku wielokąta
         public bool IsPointInside(Point pt)
         {
             double x = pt.X, y = pt.Y;
@@ -121,126 +121,27 @@ namespace GK_Proj_1
             return inside;
         }
 
-        public int Move(double x, double y, double maxX, double maxY)
-        {
-            int res = 0;
-            bool canX = true, canY = true;
-            foreach (Edge ed in Edges)
-            {
-                if (ed.p1.X + x > maxX || ed.p1.X + x < 0)
-                    canX = false;
-                if (ed.p1.Y + y > maxY || ed.p2.Y + y < 0)
-                    canY = false;
-                if (!canY && !canX)
-                    return res;
-            }
-
-            if (canX)
-            {
-                MoveX(x);
-                res++;
-            }
-
-            if (canY)
-            {
-                MoveY(y);
-                res += 2;
-            }
-
-            return res;
-        }
-
+        // Przesuwamy figurę niezależnie od tego, czy będzie na ekranie czy nie
         public void SimpleMove(double x, double y)
         {
-            MoveX(x);
-            MoveY(y);
-        }
-
-        public void MoveVert(double x, double y, int vertind)
-        {
-            if (vertind == 0)
-            {
-                Edges[0].p1.X += x;
-                Edges[0].p1.Y += y;
-                Edges[Edges.Count - 1].p2.X += x;
-                Edges[Edges.Count - 1].p2.Y += y;
-                return;
-            }
-
-            Edges[vertind].p1.X += x;
-            Edges[vertind].p1.Y += y;
-            Edges[vertind - 1].p2.X += x;
-            Edges[vertind - 1].p2.Y += y;
-        }
-
-        public void MoveEdge(double x, double y, int edgeind)
-        {
-            if (edgeind == 0)
-            {
-                Edges[0].p1.X += x;
-                Edges[0].p1.Y += y;
-                Edges[0].p2.X += x;
-                Edges[0].p2.Y += y;
-                Edges[Edges.Count - 1].p2.X += x;
-                Edges[Edges.Count - 1].p2.Y += y;
-                Edges[1].p1.X += x;
-                Edges[1].p1.Y += y;
-                return;
-            }
-
-            if (edgeind == Edges.Count - 1)
-            {
-                Edges[edgeind].p1.X += x;
-                Edges[edgeind].p1.Y += y;
-                Edges[edgeind].p2.X += x;
-                Edges[edgeind].p2.Y += y;
-                Edges[edgeind - 1].p2.X += x;
-                Edges[edgeind - 1].p2.Y += y;
-                Edges[0].p1.X += x;
-                Edges[0].p1.Y += y;
-                return;
-            }
-
-            Edges[edgeind].p1.X += x;
-            Edges[edgeind].p1.Y += y;
-            Edges[edgeind].p2.X += x;
-            Edges[edgeind].p2.Y += y;
-            Edges[edgeind - 1].p2.X += x;
-            Edges[edgeind - 1].p2.Y += y;
-            Edges[edgeind + 1].p1.X += x;
-            Edges[edgeind + 1].p1.Y += y;
-        }
-
-        public void MoveY(double y)
-        {
             foreach (Edge ed in Edges)
             {
+                ed.p1.X += x;
+                ed.p2.X += x;
                 ed.p1.Y += y;
                 ed.p2.Y += y;
                 if (ed.type == RelationType.Bezier)
                 {
                     BezierEdge bed = ed as BezierEdge;
+                    bed.p1c.X += x;
+                    bed.p2c.X += x;
                     bed.p1c.Y += y;
                     bed.p2c.Y += y;
                 }
             }
         }
 
-        public void MoveX(double x)
-        {
-            foreach (Edge ed in Edges)
-            {
-                ed.p1.X += x;
-                ed.p2.X += x;
-                if (ed.type == RelationType.Bezier)
-                {
-                    BezierEdge bed = ed as BezierEdge;
-                    bed.p1c.X += x;
-                    bed.p2c.X += x;
-                }
-            }
-        }
-
+        // Aktualizujemy w każdej krawędzi referencje do p1Edge i p2Edge
         public void UpdateAllRelations()
         {
             int p = Edges.Count - 1, n = 1;
@@ -253,6 +154,7 @@ namespace GK_Proj_1
             }
         }
 
+        // Aktualizujemy w danej krawędzi referencje do p1Edge i p2Edge
         public void UpdateRelation(int ind)
         {
             Edge edge = Edges[ind];
@@ -278,6 +180,7 @@ namespace GK_Proj_1
             edge.p2Edge = Edges[ind + 1];
         }
 
+        // Próbujemy przesunąć wierzchołek o indeksie vertind do punktu pt 
         public bool TryMoveVert(Point pt, int vertind)  
         {
             if(Edges[vertind].MoveP1To(pt,Edges.Count))
@@ -286,6 +189,7 @@ namespace GK_Proj_1
             return false;
         }
 
+        // Próbujemy przesunąć punkt kontrolny
         public bool TryMoveControlPoint(Point pt, int vertind, int controlptind) 
         {
             if(Edges[vertind].MoveCPTo(pt, controlptind, Edges.Count))
@@ -301,6 +205,7 @@ namespace GK_Proj_1
             return false;
         }
 
+        // Próbujemy przesunąć całą krawędź
         public bool TryMoveEdge(double x, double y, int edgeind)
         {
             if (Edges[edgeind].MoveEdge(x, y, Edges.Count - 1))
@@ -309,17 +214,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        public bool CheckRelationsWithoutEdge(int ind)
-        {
-            if (Edges.Count == 3)
-                return false;
-            int p = ind - 1, n = (ind + 1) % Edges.Count;
-            if (ind == 0)
-                p = Edges.Count - 1;
-
-            return (Edges[n].type == RelationType.Regular || Edges[n].type == RelationType.FixedLen || Edges[n].type == RelationType.Bezier || !(Edges[p].type == Edges[n].type));
-        }
-
+        // Sprawdzamy, czy możemy usunąć/dodać krawędź o danym typie
         public bool CheckRelationsOfEdge(int ind, RelationType type)
         {
             int p = ind - 1, n = (ind + 1) % Edges.Count;
@@ -328,6 +223,7 @@ namespace GK_Proj_1
             return (type == RelationType.Regular || type == RelationType.FixedLen || type == RelationType.Bezier || (Edges[n].type != type && type != Edges[p].type));
         }
 
+        // Przy zmianie typu wierzchołka korygujemy figure
         public void AdjustFigureToVertRelation(int vertind)
         {
             if (Edges[vertind].type == RelationType.Bezier)

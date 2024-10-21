@@ -18,5 +18,7 @@ namespace GK_Proj_1
         public static int VertSize = 4;
 
         public static double Eps = 0.01;
+
+        public static int LineWidth = 3;
     }
 }

@@ -11,6 +11,7 @@ namespace GK_Proj_1
 {
     public static class DrawingAlgorithms
     {
+        // Algorytm Bresenhama - zwracamy tutaj listę piskelów do pokolorwania
         public static List<(int x,int y)> BresenhamLine(int x1,int y1,int x2, int y2)
         {
             List<(int x, int y)> res = new List<(int x, int y)> ();
@@ -87,15 +88,17 @@ namespace GK_Proj_1
             return res;
         }
 
+        // Rysujemy linię zwróconą z algorytmu Bresenhama
         public static void DrawBresenhamLine(Point p1, Point p2, DrawingContext dc)
         {
             List<(int x, int y)> pixels = BresenhamLine((int)p1.X, (int)p1.Y, (int)p2.X, (int)p2.Y);
             foreach ((int x, int y) in pixels )
             {
-                dc.DrawRectangle(Var.EdgeColor, null, new System.Windows.Rect(x,y,3,3));
+                dc.DrawRectangle(Var.EdgeColor, null, new System.Windows.Rect(x,y,Var.LineWidth,Var.LineWidth));
             }
         }
 
+        // Rysujemy krzywą Beziera 3 stopnia
         // punkty są tutaj nazywane zgodnie z literaturą nie z resztą programu
         // p0 - p3 to odpowiednio początki o końce krzywej Beziera
         public static List<(int x, int y)> DrawBezierCurve(Point p0, Point p1, Point p2, Point p3, DrawingContext dc)
@@ -103,7 +106,7 @@ namespace GK_Proj_1
             List<(int x, int y)> pixels = BezierCubicLine((int)p0.X, (int)p0.Y,(int)p1.X, (int)p1.Y, (int)p2.X, (int)p2.Y, (int)p3.X, (int)p3.Y);
             foreach ((int x, int y) in pixels)
             {
-                dc.DrawRectangle(Var.EdgeColor, null, new System.Windows.Rect(x, y, 3, 3));
+                dc.DrawRectangle(Var.EdgeColor, null, new System.Windows.Rect(x, y, Var.LineWidth, Var.LineWidth));
             }
             return pixels;
         }

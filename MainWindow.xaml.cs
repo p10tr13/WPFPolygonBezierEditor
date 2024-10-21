@@ -29,20 +29,27 @@ namespace GK_Proj_1
         }
 
         // Zmienne
+
         private ContextMenu vertContextMenu, edgeContextMenu;
-        private bool drawing = false;
-        private Figure drawingFigure = new Figure();
-        private Edge drawingAnimationEdge = null;
+        private bool drawing = false; // Czy teraz rysujemy?
+        private Figure drawingFigure = new Figure(); // Nasza figura
+        private Edge drawingAnimationEdge = null; // Krawędź, która podąża za kursorem przy rysowaniu
+
+        // Zmienne, który element miał na myśli użytkownik klikający ekran
         private int selectedVert = -1;
         private int selectedCVert = -1;
         private int selectedEdge = -1;
+
+        // Zmienne do przeciągania elementów
         private bool draggingFigure = false;
         private bool draggingVert = false;
         private bool draggingEdge = false;
         private bool draggingCVert = false;
-        private Point addVertPoint = new Point(0, 0);
-        private Point lastMousePosition = new Point(0, 0);
 
+        private Point addVertPoint = new Point(0, 0); // Punkt kliknięcia myszy, przy dodawaniu wierzchołka do krawędzi
+        private Point lastMousePosition = new Point(0, 0); // Ostatnia pozycja myszki przy ruszaniu po Canva
+
+        // Tworzenie menu contextowego dla kliknięcia wierchołka
         private void InitializeVertContextMenu()
         {
             vertContextMenu = new ContextMenu();
@@ -60,6 +67,7 @@ namespace GK_Proj_1
             vertContextMenu.Items.Add(g1MenuItem);
         }
 
+        // Tworzenie menu contextowego dla kliknięcia krawędzi
         private void InitializeEdgeContextMenu()
         {
             edgeContextMenu = new ContextMenu();
@@ -89,6 +97,7 @@ namespace GK_Proj_1
             deleteRelMenuItem.Click += DeleteRelItemClick;
         }
 
+        // Usuwanie wierzchołka
         private void DeleteMenuItemClick(object sender, RoutedEventArgs e)
         {
             if (drawingFigure.Edges.Count == 3)
@@ -120,6 +129,7 @@ namespace GK_Proj_1
             return;
         }
 
+        // Zmiana rodzaju wierzchołka na G0
         private void G0MenuItemClick(object sender, EventArgs e)
         {
             drawingFigure.Edges[selectedVert].vertType = VertRelationType.G0;
@@ -127,6 +137,7 @@ namespace GK_Proj_1
             return;
         }
 
+        // Zmiana rodzaju wierzchołka na G1, tylko gdy jest przy Bezierze
         private void G1MenuItemClick(object sender, EventArgs e)
         {
             if (drawingFigure.Edges[selectedVert].vertType == VertRelationType.G1)
@@ -146,15 +157,18 @@ namespace GK_Proj_1
             Redraw();
         }
 
+        // Dodanie nowego wierzchołka
         private void AddVertexItemClick(object sender, RoutedEventArgs e)
         {
-            Point middle = drawingFigure.Edges[selectedEdge].ClosestPointOnEdge(addVertPoint);
+            Point p1 = drawingFigure.Edges[selectedEdge].p1, p2 = drawingFigure.Edges[selectedEdge].p2;
+            Point middle = Geometry.ClosestPointOnEdge(addVertPoint, p1, p2);
             Edge ed = new Edge(middle, drawingFigure.Edges[selectedEdge].p2);
             drawingFigure.AddEdgeAt(selectedEdge + 1, ed);
             drawingFigure.Edges[selectedEdge].AdjustP2(1, drawingFigure.Edges.Count);            
             Redraw();
         }
 
+        // Zmiana krawędzi na poziomą
         private void HorEdgeItemClick(object sender, RoutedEventArgs e)
         {
             if (!drawingFigure.CheckRelationsOfEdge(selectedEdge, RelationType.Horizontal))
@@ -169,6 +183,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
+        // Zmiana krawędzi na pionową
         private void VerEdgeItemClick(object sender, RoutedEventArgs e)
         {
             if (!drawingFigure.CheckRelationsOfEdge(selectedEdge, RelationType.Vertical))
@@ -183,6 +198,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
+        // Zmiana krawędzi na taką z ustaloną długością (zablokowanie długości krawędzi)
         private void FixEdgeItemClick(object sender, RoutedEventArgs e)
         {
             Edge ed = drawingFigure.Edges[selectedEdge];
@@ -193,6 +209,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
+        // Zmiana krawędzi na krzywą Beziera 3 stopnia
         private void BezEdgeItemClick(object sender, RoutedEventArgs e)
         {
             Edge ed = drawingFigure.Edges[selectedEdge];
@@ -204,6 +221,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
+        // Usunięcie jakiegoś ograniczenia/rodzaj krawędzi jeśli istnieje
         private void DeleteRelItemClick(object sender, RoutedEventArgs e)
         {
             if (drawingFigure.Edges[selectedEdge].type == RelationType.Regular)
@@ -217,6 +235,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
+        // Zmiana trybu rysowania na "mój"
         private void BresenhamRadioButtonChecked(object sender, RoutedEventArgs e)
         {
             Var.DrawingStyle = DrawingStyle.Bresenham;
@@ -225,6 +244,7 @@ namespace GK_Proj_1
                 windowsRadioButton.IsChecked = false;
         }
 
+        // Zmiana trybu rysowania na windowsowy
         private void WindowsRadioButtonChecked(object sender, RoutedEventArgs e)
         {
             Var.DrawingStyle = DrawingStyle.Windows;
@@ -232,6 +252,7 @@ namespace GK_Proj_1
                 bresenhanRadioButton.IsChecked = false;
         }
 
+        // Ruch myszką na Canva
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
             Point pt = e.GetPosition(Canva);
@@ -275,6 +296,7 @@ namespace GK_Proj_1
 
         }
 
+        // Sprawdzamy, czy mamy zacząć przeciągać jakiś element lub rysować nową krawędź
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point pt = e.GetPosition(Canva);
@@ -340,6 +362,7 @@ namespace GK_Proj_1
             }
         }
 
+        // Otworzenie menu contextowego, jeżeli blisko jakiegoś elementu
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point pt = e.GetPosition(Canva);
@@ -362,6 +385,7 @@ namespace GK_Proj_1
             }
         }
 
+        // Puszczenie lewego klawisza myszy = kończenie przeciągania jekiegoś elementu
         private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             draggingFigure = false;
@@ -370,6 +394,7 @@ namespace GK_Proj_1
             draggingCVert = false;
         }
 
+        // Wyczyszczenie Canva i narysowanie wielokąta
         private void Redraw()
         {
             Canva.Children.Clear();

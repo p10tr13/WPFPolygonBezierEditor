@@ -9,7 +9,7 @@ namespace GK_Proj_1
 {
     public static class Geometry
     {
-        public static bool onSegment(Point p, Point q, Point r)
+        public static bool OnSegment(Point p, Point q, Point r)
         {
             if (q.X <= Math.Max(p.X, r.X) && q.X >= Math.Min(p.X, r.X) &&
                 q.Y <= Math.Max(p.Y, r.Y) && q.Y >= Math.Min(p.Y, r.Y))
@@ -18,7 +18,8 @@ namespace GK_Proj_1
             return false;
         }
 
-        public static int orientation(Point p, Point q, Point r)
+        // Skręt w lewo/prawo/prosto
+        public static int Orientation(Point p, Point q, Point r)
         {
             double val = (q.Y - p.Y) * (r.X - q.X) -
                     (q.X - p.X) * (r.Y - q.Y);
@@ -28,33 +29,36 @@ namespace GK_Proj_1
             return (val > 0) ? 1 : 2; 
         }
 
-        public static bool doIntersect(Point p1, Point q1, Point p2, Point q2)
+        // Czy dwa dane odcinki się przecinają?
+        public static bool Intersect(Point p1, Point q1, Point p2, Point q2)
         {
 
-            int o1 = orientation(p1, q1, p2);
-            int o2 = orientation(p1, q1, q2);
-            int o3 = orientation(p2, q2, p1);
-            int o4 = orientation(p2, q2, q1);
+            int o1 = Orientation(p1, q1, p2);
+            int o2 = Orientation(p1, q1, q2);
+            int o3 = Orientation(p2, q2, p1);
+            int o4 = Orientation(p2, q2, q1);
 
             if (o1 != o2 && o3 != o4)
                 return true;
 
-            if (o1 == 0 && onSegment(p1, p2, q1)) return true;
+            if (o1 == 0 && OnSegment(p1, p2, q1)) return true;
 
-            if (o2 == 0 && onSegment(p1, q2, q1)) return true;
+            if (o2 == 0 && OnSegment(p1, q2, q1)) return true;
 
-            if (o3 == 0 && onSegment(p2, p1, q2)) return true;
+            if (o3 == 0 && OnSegment(p2, p1, q2)) return true;
 
-            if (o4 == 0 && onSegment(p2, q1, q2)) return true;
+            if (o4 == 0 && OnSegment(p2, q1, q2)) return true;
 
             return false;
         }
 
+        // Czy trzy punkty są współliniowe?
         public static bool IsCollinear(Point x1, Point x2, Point x3)
         {
             return Math.Abs((x2.X - x1.X) * (x3.Y - x1.Y) - (x2.Y - x1.Y) * (x3.X - x1.X)) < Var.Eps;
         }
 
+        // Zwraca punkt najbliższy punktowi , aby był współliniowy z  i  
         public static Point MovePointToBeCollinear(Point x1, Point x2, Point x3)
         {
             double dx = x2.X - x1.X;
@@ -65,6 +69,7 @@ namespace GK_Proj_1
             return new Point(x1.X + dx * t, x1.Y + dy * t);
         }
 
+        // Zwraca środek pomiędzy dwoma punktami
         public static Point GetMiddle(Point p1, Point p2)
         {
             Point middle = new Point();
@@ -82,6 +87,7 @@ namespace GK_Proj_1
             return middle;
         }
 
+        // Znajduje punkt przecięcia dwóch prostych na przechodzących przez punkty p1-p2 oraz p3-p4
         public static Point FindIntersection(Point p1, Point p2, Point p3, Point p4)
         {
             if (Math.Abs(p2.X - p1.X) < Var.Eps || Math.Abs(p4.X - p3.X) < Var.Eps)
@@ -107,6 +113,19 @@ namespace GK_Proj_1
                 return new Point(-1, -1);
 
             return new Point(x, y);
+        }
+
+        // Znajduje punkt naleźący do odcinka p1-p2, który jest najbliższy pt
+        public static Point ClosestPointOnEdge(Point pt, Point p1, Point p2)
+        {
+            double LLS = Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2);
+            if (LLS == 0.0)
+                return new Point(-1, -1);
+            double t = ((pt.X - p1.X) * (p2.X - p1.X) + (pt.Y - p1.Y) * (p2.Y - p1.Y)) / LLS;
+            t = Math.Max(0, Math.Min(1, t));
+            double closeX = p1.X + t * (p2.X - p1.X);
+            double closeY = p1.Y + t * (p2.Y - p1.Y);
+            return new Point(closeX, closeY);
         }
     }
 }

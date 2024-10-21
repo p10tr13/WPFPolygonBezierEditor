@@ -12,11 +12,10 @@ namespace GK_Proj_1.Edges
 {
     public class Edge
     {
-        public RelationType type { get; set; }
-        public VertRelationType vertType { get; set; }
-        public Edge? p1Edge, p2Edge;
-        public Point p1;
-        public Point p2;
+        public RelationType type { get; set; } // Typ tej krawędzi
+        public VertRelationType vertType { get; set; } // Typ wierzchołka p1
+        public Edge? p1Edge, p2Edge; // Krawędzie sąsiadujące (np. p1Edge - krawędź sąsiadująca zz wierzchołkiem p1)
+        public Point p1, p2; // Wierzchołki krawędzi
 
         public Edge(Point pnt1, Point pnt2)
         {
@@ -26,13 +25,14 @@ namespace GK_Proj_1.Edges
             vertType = VertRelationType.G0;
         }
 
+        // Rysowanie krawędzi i kropki wierzchołka p1
         public virtual void Draw(DrawingContext dc)
         {
             switch(Var.DrawingStyle)
             {
                 case DrawingStyle.Windows:
                     {
-                        Pen pen = new Pen(Var.EdgeColor, 3);
+                        Pen pen = new Pen(Var.EdgeColor, Var.LineWidth);
                         dc.DrawLine(pen, p1, p2);
                         break;
                     }
@@ -45,6 +45,7 @@ namespace GK_Proj_1.Edges
             dc.DrawEllipse(Var.VertColor, null, p1, Var.VertSize, Var.VertSize);
         }
 
+        // Sprawdzamy, czy punkt kliknięcia jest blisko p1
         public bool IsNearP1Vert(Point pt)
         {
             if ((p1 - pt).Length < 10)
@@ -54,6 +55,7 @@ namespace GK_Proj_1.Edges
             return false;
         }
 
+        // Sprawdzamy, czy punkt kliknięcia jest blisko p2
         public bool IsNearP2Vert(Point pt)
         {
             if ((p2 - pt).Length < 10)
@@ -63,26 +65,23 @@ namespace GK_Proj_1.Edges
             return false;
         }
 
-        public Point ClosestPointOnEdge(Point pt)
-        {
-            double LLS = Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2);
-            if (LLS == 0.0)
-                return new Point(-1, -1);
-            double t = ((pt.X - p1.X) * (p2.X - p1.X) + (pt.Y - p1.Y) * (p2.Y - p1.Y)) / LLS;
-            t = Math.Max(0, Math.Min(1, t));
-            double closeX = p1.X + t * (p2.X - p1.X);
-            double closeY = p1.Y + t * (p2.Y - p1.Y);
-            return new Point(closeX, closeY);
-        }
-
+        // Sprawdzamy, czy punkt kliknięcia jest blisko krawędzi
         public virtual bool IsNearEdge(Point pt)
         {
-            Point closestpt = ClosestPointOnEdge(pt);
+            Point closestpt = Geometry.ClosestPointOnEdge(pt, p1, p2);
             if (closestpt.X == -1 && closestpt.Y == -1)
                 return false;
             return (closestpt - pt).Length < 10;
         }
 
+        // Sprawdzamy, czy dany punkt jest blisko punktu kontrolnego
+        public virtual bool IsNearControlPoint(Point pt, out int indc)
+        {
+            indc = -1;
+            return false;
+        }
+
+        // Dopasowanie pozycji wierzchołka p1 do p1Edge.p2
         public virtual bool AdjustP1(int ind, int maxRecCount)
         {
             if (p1Edge == null || p2Edge == null)
@@ -93,6 +92,7 @@ namespace GK_Proj_1.Edges
             return true;
         }
 
+        // Dopasowanie pozycji wierzchołka p2 do p2Edge.p1
         public virtual bool AdjustP2(int ind, int maxRecCount)
         {
             if (p2Edge == null || p1Edge == null)
@@ -103,6 +103,7 @@ namespace GK_Proj_1.Edges
             return true;
         }
 
+        // Przesunięcie wierzchołka p1 w dane miejsce, a następnie dopasowanie krawędzi z nim sąsiadującą
         public virtual bool MoveP1To(Point pt, int edgesCount)
         {
             if (p1Edge == null || p2Edge == null)
@@ -113,11 +114,13 @@ namespace GK_Proj_1.Edges
             return p1Edge.AdjustP2(0, edgesCount);
         }
 
+        // Funkcja przesuwa punkt kontrolny, jeżeli taki przy krawędzi jest
         public virtual bool MoveCPTo(Point pt, int cpind, int edgesCount)
         {
             return false;
         }
 
+        // Przesuwamy całą krawędź i "doczepiamy" do niej krawędzie odczepiuone przy przesunięciu
         public virtual bool MoveEdge(double x, double y, int edgesCount)
         {
             if(p1Edge == null || p2Edge == null)
@@ -146,16 +149,14 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
-        public virtual bool IsNearControlPoint(Point pt, out int indc)
-        {
-            indc = -1;
-            return false;
-        }
-
+        // Dopasowywuje położenie punktu kontrolnego przy wierzchołku p1, jeżeli jest taka potrzeba
         public virtual void AdjustCP1(double dx, double dy) {}
 
+        // Dopasowywuje położenie punktu kontrolnego przy wierzchołku p2, jeżeli jest taka potrzeba 
         public virtual void AdjustCP2(double dx, double dy) {}
 
+        // Funckja ustawia krawędź, aby była współliniowa do p1 i jego punktu kontrolnego,
+        // następnie dołącza do nowej pozycji następną krawędź
         public virtual bool MakeCollinearToP1(int ind, int edgesCount)
         {
             bool res = false;
@@ -237,6 +238,8 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
+        // Funckja ustawia krawędź, aby była współliniowa do p2 i jego punktu kontrolnego,
+        // następnie dołącza do nowej pozycji następną krawędź
         public virtual bool MakeCollinearToP2(int ind, int edgesCount)
         {
             bool res = false;
@@ -318,7 +321,8 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
-        // Podajemy z którym wierzchołkiem jest połączony bezpośrednio ten wierzchołek
+        // Podajemy z którym wierzchołkiem jest połączony bezpośrednio ten wierzchołek i zwraca
+        // punkty, z którymi powinniśmy ustalić współliniowość
         public virtual (Point p1,  Point p2) GetCollinearPoints(int vert)
         {
             if(vert == 2)

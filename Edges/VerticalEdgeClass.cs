@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using System.Windows;
 using Point = System.Windows.Point;
 
@@ -25,24 +20,18 @@ namespace GK_Proj_1.Edges
             if (ind == maxRecCount)
                 return false;
 
-            switch (p2Edge.type)
+            Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
+            bool res = false;
+            p1 = p1Edge.p2;
+            p2 = new Point(p1.X, p2.Y);
+            if (p2Edge != null)
+                res = p2Edge.AdjustP1(++ind, maxRecCount);
+            if (!res)
             {
-                default:
-                    {
-                        Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
-                        bool res = false;
-                        p1 = p1Edge.p2;
-                        p2 = new Point(p1.X, p2.Y);
-                        if (p2Edge != null)
-                            res = p2Edge.AdjustP1(++ind, maxRecCount);
-                        if (!res)
-                        {
-                            p1 = oldp1;
-                            p2 = oldp2;
-                        }
-                        return res;
-                    }
+                p1 = oldp1;
+                p2 = oldp2;
             }
+            return res;
         }
 
         public override bool AdjustP2(int ind, int maxRecCount)
@@ -57,24 +46,18 @@ namespace GK_Proj_1.Edges
             if (ind == maxRecCount)
                 return false;
 
-            switch (p1Edge.type)
+            Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
+            bool res = false;
+            p2 = p2Edge.p1;
+            p1 = new Point(p2.X, p1.Y);
+            if (p1Edge != null)
+                res = p1Edge.AdjustP2(++ind, maxRecCount);
+            if (!res)
             {
-                default:
-                    {
-                        Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
-                        bool res = false;
-                        p2 = p2Edge.p1;
-                        p1 = new Point(p2.X, p1.Y);
-                        if (p1Edge != null)
-                            res = p1Edge.AdjustP2(++ind, maxRecCount);
-                        if (!res)
-                        {
-                            p1 = oldp1;
-                            p2 = oldp2;
-                        }
-                        return res;
-                    }
+                p1 = oldp1;
+                p2 = oldp2;
             }
+            return res;
         }
 
         public override bool MoveP1To(Point pt, int edgesCount)

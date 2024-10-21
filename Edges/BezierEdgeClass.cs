@@ -14,12 +14,13 @@ namespace GK_Proj_1.Edges
 {
     public class BezierEdge : Edge
     {
-        public Point p1c, p2c;
+        public Point p1c, p2c; // Punkty kontrolne
 
-        private List<(int x, int y)> pixels;
+        private List<(int x, int y)> pixels; // Lista pikseli, w których rysujemy krzywą
 
         public BezierEdge(Point pnt1, Point pnt2) : base(pnt1, pnt2)
         {
+            // Wybrane ich początkowe pozycje to romb
             p1c = new Point((2 * p1.X + 2 * p2.X - p2.Y + p1.Y) / 4, (2 * p1.Y + 2 * p2.Y + p2.X - p1.X) / 4);
             p2c = new Point((2 * p1.X + 2 * p2.X + p2.Y - p1.Y) / 4, (2 * p1.Y + 2 * p2.Y - p2.X + p1.X) / 4);
             type = RelationType.Bezier;
@@ -46,6 +47,7 @@ namespace GK_Proj_1.Edges
                 return (p2c, p2);   
         }
 
+        // Funkcja wypisuje odpowiednie G0/G1 przy wierzchołku
         public void DrawG(DrawingContext dc)
         {
             string s1, s2;
@@ -76,6 +78,7 @@ namespace GK_Proj_1.Edges
             }
         }
 
+        // Zwracamy czy punkt jest bliskoo punktu kontrolnego oraz informację którego
         public override bool IsNearControlPoint(Point pt, out int indc)
         {
             if ((p1c - pt).Length < 10)
@@ -92,6 +95,7 @@ namespace GK_Proj_1.Edges
             return false;
         }
 
+        // Przesuwamy punkt kontrolny o danym indeksie do pt
         public override bool MoveCPTo(Point pt, int cpind, int edgesCount)
         {
             if (cpind == 1)
@@ -140,7 +144,7 @@ namespace GK_Proj_1.Edges
                 return false;
             double dx = p1Edge.p2.X - p1.X, dy = p1Edge.p2.Y - p1.Y;
 
-            if (Geometry.doIntersect(p1, p2, p1c, p2c))
+            if (Geometry.Intersect(p1, p2, p1c, p2c))
             {
                 p1 = p1Edge.p2;
                 AdjustCP1(dx, dy);
@@ -162,7 +166,7 @@ namespace GK_Proj_1.Edges
                 return false;
             double dx = p2Edge.p1.X - p2.X, dy = p2Edge.p1.Y - p2.Y;
 
-            if (Geometry.doIntersect(p1, p2, p1c, p2c))
+            if (Geometry.Intersect(p1, p2, p1c, p2c))
             {
                 p2 = p2Edge.p1;
                 AdjustCP1(-dx,-dy);
@@ -178,6 +182,7 @@ namespace GK_Proj_1.Edges
             return true;
         }
 
+        // Zmieniamy miejsce punktu kontrolnego p1c
         public bool MoveCP1To(Point pt, int edgesCount)
         {
             Point p1cold = p1c;
@@ -222,6 +227,7 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
+        // Zmieniamy miejsce punktu kontrolnego p2c
         public bool MoveCP2To(Point pt, int edgesCount)
         {
             Point p2cold = p2c;
@@ -265,6 +271,8 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
+        // Sprawdzam piksele, czy punkt liknięty na ekranie jest blisko piksela,
+        // a nie punktu pomiędzy wierzchołkami p1 i p2
         public override bool IsNearEdge(Point pt)
         {
             foreach ((int x, int y) in pixels)
