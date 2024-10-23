@@ -29,7 +29,19 @@ namespace GK_Proj_1.Edges
 
         public override void Draw(DrawingContext dc)
         {
-            pixels = DrawingAlgorithms.DrawBezierCurve(p1, p1c, p2c, p2, dc);
+            switch (Var.BezierDrawingStyle)
+            {
+                case BezierDrawingStyle.Rasterisation:
+                    {
+                        pixels = DrawingAlgorithms.DrawBezierCurve(p1, p1c, p2c, p2, dc);
+                        break;
+                    }
+                case BezierDrawingStyle.Easy:
+                    {
+                        pixels = DrawingAlgorithms.DrawBezierCurve(p1, p1c, p2c, p2, dc, 100);
+                        break;
+                    }
+            }
             dc.DrawLine(new Pen(Brushes.LightGray, 2), p1, p2);
             dc.DrawLine(new Pen(Brushes.LightGray, 2), p1, p1c);
             dc.DrawLine(new Pen(Brushes.LightGray, 2), p2, p2c);

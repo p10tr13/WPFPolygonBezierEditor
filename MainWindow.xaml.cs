@@ -26,6 +26,7 @@ namespace GK_Proj_1
             InitializeVertContextMenu();
             InitializeEdgeContextMenu();
             Var.DrawingStyle = DrawingStyle.Windows;
+            Var.BezierDrawingStyle = BezierDrawingStyle.Rasterisation;
         }
 
         // Zmienne
@@ -236,6 +237,7 @@ namespace GK_Proj_1
                 drawingFigure.Edges.RemoveAt(selectedEdge);
                 drawingFigure.AddEdgeAt(selectedEdge, fix);
                 bool res = false;
+                fix.length = newLen;
                 res = fix.p1Edge.AdjustP2(0, drawingFigure.Edges.Count);
                 if (!res) 
                 { 
@@ -446,6 +448,21 @@ namespace GK_Proj_1
             draggingVert = false;
             draggingEdge = false;
             draggingCVert = false;
+        }
+
+        private void RasterisationRadioButtonChecked(object sender, RoutedEventArgs e)
+        {
+            Var.BezierDrawingStyle = BezierDrawingStyle.Rasterisation;
+            if(easyRadioButton != null)
+                easyRadioButton.IsChecked = false;
+        }
+
+        private void EasyRadioButtonChecked(object sender, RoutedEventArgs e)
+        {
+            Var.BezierDrawingStyle = BezierDrawingStyle.Easy;
+            Redraw();
+            if(rasterisationRadioButton != null)
+                rasterisationRadioButton.IsChecked = false;
         }
 
         // Wyczyszczenie Canva i narysowanie wielokąta

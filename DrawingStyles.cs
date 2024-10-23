@@ -12,4 +12,11 @@ namespace GK_Proj_1
         Windows,
         Bresenham
     }
+
+    // Sposób rysowania krawędzi Beziera
+    public enum BezierDrawingStyle
+    {
+        Easy,
+        Rasterisation
+    }
 }

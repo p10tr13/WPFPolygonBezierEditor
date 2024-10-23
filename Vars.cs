@@ -11,6 +11,8 @@ namespace GK_Proj_1
     {
         public static DrawingStyle DrawingStyle { get; set; }
 
+        public static BezierDrawingStyle BezierDrawingStyle { get; set; }
+
         public static Brush EdgeColor = Brushes.CadetBlue;
 
         public static Brush VertColor = Brushes.Purple;

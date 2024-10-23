@@ -111,7 +111,36 @@ namespace GK_Proj_1
             return pixels;
         }
 
-        // Alois Zingl
+        public static List<(int x, int y)> DrawBezierCurve(Point p0, Point p1, Point p2, Point p3, DrawingContext dc, int dots)
+        {
+            List<(int x, int y)> points = new List<(int x, int y)>();
+            List<(int x, int y)> pixels = new List<(int x, int y)>();
+
+            double a1x = 3 * (p1.X - p0.X), a1y = 3 * (p1.Y - p0.Y), a2x = 3 * (p2.X - 2 * p1.X + p0.X), a2y = 3 * (p2.Y - 2 * p1.Y + p0.Y);
+            double a3x = p3.X - 3 * p2.X + 3 * p1.X - p0.X, a3y = p3.Y - 3 * p2.Y + 3 * p1.Y - p0.Y, x, y;
+            float step = 1 / (float)dots;
+            for (float t = 0; t <=1; t+=step)
+            {
+                x = a3x * Math.Pow(t, 3) + a2x * Math.Pow(t, 2) + a1x * t + p0.X;
+                y = a3y * Math.Pow(t, 3) + a2y * Math.Pow(t, 2) + a1y * t + p0.Y;
+                points.Add(((int)x, (int)y));
+            }
+            
+            for (int i = 1; i < points.Count; i++)
+            {
+                int x1 = points[i-1].x, y1 = points[i - 1].y;
+                int x2 = points[i].x, y2 = points[i].y;
+                pixels.AddRange(BresenhamLine(x1, y1, x2, y2));
+            }
+
+            foreach ((int xp, int yp) in pixels)
+            {
+                dc.DrawRectangle(Var.EdgeColor, null, new System.Windows.Rect(xp, yp, Var.LineWidth, Var.LineWidth));
+            }
+            return pixels;
+        }
+
+        // Alois Zingl https://zingl.github.io/Bresenham.pdf
         public static List<(int x, int y)> BezierCubicLine(int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3)
         {
             List<(int, int)> pixels = new List<(int, int)> ();

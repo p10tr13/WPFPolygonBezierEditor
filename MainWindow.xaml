@@ -14,10 +14,13 @@
         <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="3" Margin="5">
         <Canvas x:Name="Canva" Background="White" MouseLeftButtonUp="Canvas_MouseLeftButtonUp"  MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="Canvas_MouseMove" MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
         </Border>
-        <StackPanel Grid.Column="1">
+        <StackPanel Grid.Column="1" Margin="10">
             <TextBlock>Sposób rysowania krawędzi:</TextBlock>
-            <RadioButton x:Name="windowsRadioButton" IsChecked="True" Checked="WindowsRadioButtonChecked" >Windows</RadioButton>
+            <RadioButton x:Name="windowsRadioButton" IsChecked="True" Checked="WindowsRadioButtonChecked">Windows</RadioButton>
             <RadioButton x:Name="bresenhanRadioButton" Checked="BresenhamRadioButtonChecked" IsChecked="False">Bresenham</RadioButton>
+            <TextBlock>Sposób rysowania Beziera:</TextBlock>
+            <RadioButton x:Name="rasterisationRadioButton" IsChecked="True" Checked="RasterisationRadioButtonChecked">Rasterisation</RadioButton>
+            <RadioButton x:Name="easyRadioButton" Checked="EasyRadioButtonChecked" IsChecked="False">Wzór z wykładu</RadioButton>
         </StackPanel>
     </Grid>
 </Window>

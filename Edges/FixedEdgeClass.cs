@@ -15,7 +15,7 @@ namespace GK_Proj_1.Edges
     {
         public FixedLenEdge(Point p1, Point p2) : base(p1, p2) { length = (p1 - p2).Length; type = RelationType.FixedLen; }
 
-        public double length { get; }
+        public double length { get; set; }
 
         public override bool MoveP1To(Point pt, int edgesCount)
         {
