@@ -145,8 +145,9 @@ namespace GK_Proj_1.Edges
                 p1c = Geometry.MovePointToBeCollinear(pt1, pt2, p1c);
                 dx = pt2.X - pt1.X;
                 dy = pt2.Y - pt1.Y;
-                p1c.X = pt2.X + dx;
-                p1c.Y = pt2.Y + dy;
+                if (p1Edge.type == RelationType.Bezier) { p1c.X = pt2.X + dx; p1c.Y = pt2.Y + dy; return; }
+                p1c.X = pt2.X + dx/3;
+                p1c.Y = pt2.Y + dy/3;
             }
         }
 
@@ -166,13 +167,14 @@ namespace GK_Proj_1.Edges
                     p2c.Y += 2 * dy;
                 }
             }
-            else if (vertType == VertRelationType.C1)
+            else if (p2Edge.vertType == VertRelationType.C1)
             {
                 p2c = Geometry.MovePointToBeCollinear(pt1, pt2, p2c);
                 dx = pt2.X - pt1.X;
                 dy = pt2.Y - pt1.Y;
-                p2c.X = pt2.X + dx;
-                p2c.Y = pt2.Y + dy;
+                if (p2Edge.type == RelationType.Bezier) { p2c.X = pt2.X + dx; p2c.Y = pt2.Y + dy; return; }
+                p2c.X = pt2.X + dx/3;
+                p2c.Y = pt2.Y + dy/3;
             }
         }
 
@@ -229,7 +231,7 @@ namespace GK_Proj_1.Edges
             if (vertType == VertRelationType.G0)
                 return true;
             (Point pt1, Point pt2) = p1Edge.GetCollinearPoints(2);
-            if (Geometry.IsCollinear(pt1, pt2, p1c) || (p1c - p1).Length < 2)
+            if ((Geometry.IsCollinear(pt1, pt2, p1c) && vertType == VertRelationType.G1) || (p1c - p1).Length < 2)
                 return true;
             bool res = false;
             switch (p1Edge.type)
@@ -237,13 +239,31 @@ namespace GK_Proj_1.Edges
                 case RelationType.Horizontal:
                     {
                         p1.Y = pt.Y;
-                        res = p1Edge.AdjustP2(1, edgesCount);
+                        if (vertType == VertRelationType.G1)
+                            res = p1Edge.AdjustP2(1, edgesCount);
+                        else
+                        {
+                            p1Edge.p2 = p1;
+                            double dx = p1.X - pt.X;
+                            double dy = p1.Y - pt.Y;
+                            p1Edge.p1 = new Point(pt.X + 4 * dx,pt.Y + 4 * dy);
+                            res = p1Edge.p1Edge.AdjustP2(2, edgesCount);
+                        }
                         break;
                     }
                 case RelationType.Vertical:
                     {
                         p1.X = pt.X;
-                        res = p1Edge.AdjustP2(1, edgesCount);
+                        if (vertType == VertRelationType.G1)
+                            res = p1Edge.AdjustP2(1, edgesCount);
+                        else
+                        {
+                            p1Edge.p2 = p1;
+                            double dx = p1.X - pt.X;
+                            double dy = p1.Y - pt.Y;
+                            p1Edge.p1 = new Point(pt.X + 4 * dx, pt.Y + 4 * dy);
+                            res = p1Edge.p1Edge.AdjustP2(2, edgesCount);
+                        }
                         break;
                     }
                 case RelationType.Bezier:
@@ -282,13 +302,31 @@ namespace GK_Proj_1.Edges
                 case RelationType.Horizontal:
                     {
                         p2.Y = pt.Y;
-                        res = p2Edge.AdjustP1(1, edgesCount);
+                        if (p2Edge.vertType == VertRelationType.G1)
+                            res = p2Edge.AdjustP1(1, edgesCount);
+                        else
+                        {
+                            p2Edge.p1 = p2;
+                            double dx = p2.X - pt.X;
+                            double dy = p2.Y - pt.Y;
+                            p2Edge.p2 = new Point(pt.X + 4 * dx, pt.Y + 4 * dy);
+                            res = p2Edge.p2Edge.AdjustP1(2, edgesCount);
+                        }
                         break;
                     }
                 case RelationType.Vertical:
                     {
                         p2.X = pt.X;
-                        res = p2Edge.AdjustP1(1, edgesCount);
+                        if (p2Edge.vertType == VertRelationType.G1)
+                            res = p2Edge.AdjustP1(1, edgesCount);
+                        else
+                        {
+                            p2Edge.p1 = p2;
+                            double dx = p2.X - pt.X;
+                            double dy = p2.Y - pt.Y;
+                            p2Edge.p2 = new Point(pt.X + 4 * dx, pt.Y + 4 * dy);
+                            res = p2Edge.p2Edge.AdjustP1(2, edgesCount);
+                        }
                         break;
                     }
                 case RelationType.Bezier:

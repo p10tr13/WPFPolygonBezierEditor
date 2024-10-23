@@ -228,9 +228,35 @@ namespace GK_Proj_1
             Edge ed = drawingFigure.Edges[selectedEdge];
             FixedLenEdge fix = new FixedLenEdge(ed.p1, ed.p2);
             fix.vertType = ed.vertType;
-            drawingFigure.Edges.RemoveAt(selectedEdge);
-            drawingFigure.AddEdgeAt(selectedEdge, fix);
-            Redraw();
+            LengthInputWindow lWin = new LengthInputWindow(fix.length);
+            if (lWin.ShowDialog() == true)
+            {
+                double newLen = lWin.Lenght;
+
+                drawingFigure.Edges.RemoveAt(selectedEdge);
+                drawingFigure.AddEdgeAt(selectedEdge, fix);
+                bool res = false;
+                res = fix.p1Edge.AdjustP2(0, drawingFigure.Edges.Count);
+                if (!res) 
+                { 
+                    MessageBox.Show("Nie da się utworzyć takiego wielokąta", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    drawingFigure.Edges.RemoveAt(selectedEdge);
+                    drawingFigure.AddEdgeAt(selectedEdge, ed);
+                    return;
+                }
+
+                res = fix.p2Edge.AdjustP1(1, drawingFigure.Edges.Count);
+
+                if (!res)
+                {
+                    MessageBox.Show("Nie da się utworzyć takiego wielokąta", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    drawingFigure.Edges.RemoveAt(selectedEdge);
+                    drawingFigure.AddEdgeAt(selectedEdge, ed);
+                    return;
+                }
+
+                Redraw();
+            }
         }
 
         // Zmiana krawędzi na krzywą Beziera 3 stopnia

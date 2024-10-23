@@ -293,7 +293,7 @@ namespace GK_Proj_1.Edges
             base.Draw(dc);
             Point middle = Geometry.GetMiddle(p1, p2);
             middle.Y -= 20;
-            FormattedText ft = new FormattedText(Math.Round(length, 2).ToString(), System.Globalization.CultureInfo.InvariantCulture,
+            FormattedText ft = new FormattedText(Math.Round(length).ToString(), System.Globalization.CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight, new Typeface("Arial"), 20,
                 Brushes.Brown, VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
             middle.X -= ft.Width / 2;
