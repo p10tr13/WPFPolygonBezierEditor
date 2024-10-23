@@ -7,6 +7,7 @@ using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 using Point = System.Windows.Point;
 
@@ -272,6 +273,19 @@ namespace GK_Proj_1.Edges
                         res = true;
                         break;
                     }
+                case RelationType.FixedLen:
+                    {
+                        Point p1Ep2old = new Point(p1Edge.p2.X, p1Edge.p2.Y);
+                        if (vertType == VertRelationType.C1) 
+                        {
+                            p1.X -= p1cold.X - pt.X;
+                            p1.Y -= p1cold.Y - pt.Y;
+                            p1Edge.p2 = p1;
+                        }
+                        res = p1Edge.MakeCollinearToP2(1, edgesCount);
+                        if (!res) { p1Edge.p2 = p1Ep2old; }
+                        break;
+                    }
                 default:
                     {
                         res = p1Edge.MakeCollinearToP2(1, edgesCount);
@@ -333,6 +347,18 @@ namespace GK_Proj_1.Edges
                     {
                         p2Edge.AdjustCP1(0, 0);
                         res = true;
+                        break;
+                    }
+                case RelationType.FixedLen:
+                    {
+                        Point p2Ep1old = new Point( p2Edge.p1.X, p2Edge.p1.Y);
+                        if (p2Edge.vertType == VertRelationType.C1)
+                        {
+                            p2.X -= p2cold.X - pt.X;
+                            p2.Y -= p2cold.Y - pt.Y;
+                            p2Edge.p1 = p2;
+                        }
+                        res = p2Edge.MakeCollinearToP1(1, edgesCount);
                         break;
                     }
                 default:
