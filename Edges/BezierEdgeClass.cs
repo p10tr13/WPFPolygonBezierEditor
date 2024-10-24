@@ -76,14 +76,14 @@ namespace GK_Proj_1.Edges
                 FormattedText ft = new FormattedText(s1, System.Globalization.CultureInfo.InvariantCulture,
                         FlowDirection.LeftToRight, new Typeface("Arial"), 15,
                         Brushes.Brown, VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip);
-                dc.DrawText(ft, new Point(p1Edge.p2.X + 10, p1Edge.p2.Y + 10));
+                dc.DrawText(ft, new Point(p1.X + 10, p1.Y + 10));
             }
 
-            if (p2Edge != null)
+            if (p2Edge != null && p2Edge.type != RelationType.Bezier)
             {
                 if (p2Edge.vertType == VertRelationType.G1)
                     s2 = "G1";
-                else if (vertType == VertRelationType.C1)
+                else if (p2Edge.vertType == VertRelationType.C1)
                     s2 = "C1";
                 else
                     s2 = "G0";
@@ -196,20 +196,8 @@ namespace GK_Proj_1.Edges
             if (p1Edge == null)
                 return false;
             double dx = p1Edge.p2.X - p1.X, dy = p1Edge.p2.Y - p1.Y;
-
-            if (Geometry.Intersect(p1, p2, p1c, p2c))
-            {
-                p1 = p1Edge.p2;
-                AdjustCP1(dx, dy);
-                AdjustCP2(-dx, -dy);
-            }
-            else
-            {
-                p1 = p1Edge.p2;
-                AdjustCP1(dx, dy);
-                AdjustCP2(dx, dy);
-            }
-
+            p1 = p1Edge.p2;
+            AdjustCP1(dx, dy);
             return true;
         }
 
@@ -218,20 +206,8 @@ namespace GK_Proj_1.Edges
             if (p2Edge == null)
                 return false;
             double dx = p2Edge.p1.X - p2.X, dy = p2Edge.p1.Y - p2.Y;
-
-            if (Geometry.Intersect(p1, p2, p1c, p2c))
-            {
-                p2 = p2Edge.p1;
-                AdjustCP1(-dx, -dy);
-                AdjustCP2(dx, dy);
-            }
-            else
-            {
-                p2 = p2Edge.p1;
-                AdjustCP1(dx, dy);
-                AdjustCP2(dx, dy);
-            }
-
+            p2 = p2Edge.p1;
+            AdjustCP2(dx, dy);
             return true;
         }
 
