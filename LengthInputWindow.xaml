@@ -8,7 +8,7 @@
         Title="Ustal długość krawędzi" Height="150" Width="200" WindowStartupLocation ="CenterScreen" ResizeMode="NoResize">
     <StackPanel Margin="10">
         <TextBlock Text="Podaj długość: "/>
-        <TextBox x:Name="LengthTextBox" Width="170" Margin="0,5,0,5"/>
+        <TextBox x:Name="LengthTextBox" Width="150" Margin="0,5,0,5"/>
         <Button x:Name="OkButton" Content="Ok" Width="100" Click="OkButton_Click"/>
     </StackPanel>
 </Window>

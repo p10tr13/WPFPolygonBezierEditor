@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.Xml;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using System.Windows;
 using Point = System.Windows.Point;
-using System.Windows.Documents;
 
 namespace GK_Proj_1.Edges
 {
@@ -30,11 +23,7 @@ namespace GK_Proj_1.Edges
                 p2 = oldp2;
                 return res;
             }
-            res = p2Edge.AdjustP1(0, edgesCount);
-            if (!res)
-            {
-
-            }
+            res = p2Edge.AdjustP1(1, edgesCount);
             return res;
         }
 
@@ -105,6 +94,39 @@ namespace GK_Proj_1.Edges
                         res = true;
                         goto AdjustingCP1;
                     }
+                }
+            }
+
+            if (p2Edge.type == RelationType.FixedLen && ind + 1 < maxRecCount)
+            {
+                double p2len = (p2Edge.p1 - p2Edge.p2).Length;
+                double d = (p1Edge.p2 - p2Edge.p2).Length;
+                if (d < p2len + length && d > Math.Abs(p2len - length))
+                {
+                    p1 = p1Edge.p2;
+                    double dx = p2Edge.p2.X - p1.X;
+                    double dy = p2Edge.p2.Y - p1.Y;
+
+                    double a = (Math.Pow(length,2) - Math.Pow(p2len,2) + Math.Pow(d,2)) / (2 * d);
+                    double h = Math.Sqrt(Math.Pow(length,2) - Math.Pow(a,2));
+
+                    double xP = p1.X + (a / d) * dx;
+                    double yP = p1.Y + (a / d) * dy;
+
+
+                    double ax1 = xP + (h / d) * (-dy);
+                    double ay1 = yP + (h / d) * dx;
+                    double ax2 = xP - (h / d) * (-dy);
+                    double ay2 = yP - (h / d) * dx;
+
+                    Point r1 = new Point(ax1, ay1), r2 = new Point(ax2, ay2);
+                    if ((p2 - r1).Length < (p2 - r2).Length)
+                        p2 = r1;
+                    else
+                        p2 = r2;
+                    p2Edge.p1 = p2;
+                    p2Edge.p2Edge.AdjustCP1(0, 0);
+                    return true;
                 }
             }
 
@@ -201,6 +223,39 @@ namespace GK_Proj_1.Edges
                         res = true;
                         goto AdjustingCP2;
                     }
+                }
+            }
+
+            if (p1Edge.type == RelationType.FixedLen && ind + 1 < maxRecCount)
+            {
+                double p1len = (p1Edge.p1 - p1Edge.p2).Length;
+                double d = (p2Edge.p1 - p1Edge.p1).Length;
+                if (d < p1len + length && d > Math.Abs(p1len - length))
+                {
+                    p2 = p2Edge.p1;
+                    double dx = p1Edge.p1.X - p2.X;
+                    double dy = p1Edge.p1.Y - p2.Y;
+
+                    double a = (Math.Pow(length, 2) - Math.Pow(p1len, 2) + Math.Pow(d, 2)) / (2 * d);
+                    double h = Math.Sqrt(Math.Pow(length, 2) - Math.Pow(a, 2));
+
+                    double xP = p2.X + (a / d) * dx;
+                    double yP = p2.Y + (a / d) * dy;
+
+
+                    double ax1 = xP + (h / d) * (-dy);
+                    double ay1 = yP + (h / d) * dx;
+                    double ax2 = xP - (h / d) * (-dy);
+                    double ay2 = yP - (h / d) * dx;
+
+                    Point r1 = new Point(ax1, ay1), r2 = new Point(ax2, ay2);
+                    if ((p1 - r1).Length < (p1 - r2).Length)
+                        p1 = r1;
+                    else
+                        p1 = r2;
+                    p1Edge.p2 = p1;
+                    p1Edge.p1Edge.AdjustCP2(0, 0);
+                    return true;
                 }
             }
 
