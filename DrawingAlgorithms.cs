@@ -105,6 +105,8 @@ namespace GK_Proj_1
             return pixels;
         }
 
+        // Algorytm rysowania krzywej Beziera z wykładu w kodzie ustawiony jest na 10 punktów, aby było widać różnicę dla innego
+        // przedstawionego sposobu rysowania
         public static List<(int x, int y)> DrawBezierCurve(Point p0, Point p1, Point p2, Point p3, DrawingContext dc, int dots)
         {
             List<(int x, int y)> points = new List<(int x, int y)>();

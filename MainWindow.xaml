@@ -21,6 +21,8 @@
             <TextBlock>Sposób rysowania Beziera:</TextBlock>
             <RadioButton x:Name="rasterisationRadioButton" IsChecked="True" Checked="RasterisationRadioButtonChecked" GroupName="GrupaB">Rasterisation</RadioButton>
             <RadioButton x:Name="easyRadioButton" Checked="EasyRadioButtonChecked" IsChecked="False" GroupName="GrupaB">Wzór z wykładu</RadioButton>
+            <TextBlock>Przykładowy wielokąt:</TextBlock>
+            <Button x:Name="DrawSampleFigureButton" HorizontalAlignment="Left" Content="Narysuj" Margin="5" Width="100" Click="DrawSampleFigureButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>

@@ -32,6 +32,25 @@ namespace GK_Proj_1
             }
         }
 
+        public void DrawSampleFigure()
+        {
+            Edges.Clear();
+            Point p1 = new Point(100, 100), p2 = new Point(100, 300), p3 = new Point(300, 300), p4 = new Point(500, 100);
+            VerticalEdge e1 = new VerticalEdge(p1, p2);
+            HorizontalEdge e2 = new HorizontalEdge(p2, p3);
+            BezierEdge e3 = new BezierEdge(p3, p4);
+            FixedLenEdge e4 = new FixedLenEdge(p4, p1);
+            Edges.Add(e1);
+            Edges.Add(e2);
+            Edges.Add(e3);
+            Edges.Add(e4);
+            UpdateAllRelations();
+            e3.vertType = VertRelationType.G1;
+            e4.vertType = VertRelationType.G1;
+            e3.AdjustCP1(0, 0);
+            e3.AdjustCP2(0, 0);
+        }
+
         // Sprawdzamy czy dany punkt jest blisko któregoś wierzchołka (numeracja po pierwszych wierzchołkach listy krawędzi)
         public bool IsNearVert(Point pt, out int ind)
         {
