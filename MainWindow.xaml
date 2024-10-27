@@ -14,7 +14,7 @@
         <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="3" Margin="5">
         <Canvas x:Name="Canva" Background="White" MouseLeftButtonUp="Canvas_MouseLeftButtonUp"  MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="Canvas_MouseMove" MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
         </Border>
-        <StackPanel Grid.Column="1" Margin="10">
+        <StackPanel Grid.Column="1">
             <TextBlock>Sposób rysowania krawędzi:</TextBlock>
             <RadioButton x:Name="windowsRadioButton" IsChecked="True" Checked="WindowsRadioButtonChecked" GroupName="GrupaA">Windows</RadioButton>
             <RadioButton x:Name="bresenhanRadioButton" Checked="BresenhamRadioButtonChecked" IsChecked="False" GroupName="GrupaA">Bresenham</RadioButton>
@@ -23,6 +23,12 @@
             <RadioButton x:Name="easyRadioButton" Checked="EasyRadioButtonChecked" IsChecked="False" GroupName="GrupaB">Wzór z wykładu</RadioButton>
             <TextBlock>Przykładowy wielokąt:</TextBlock>
             <Button x:Name="DrawSampleFigureButton" HorizontalAlignment="Left" Content="Narysuj" Margin="5" Width="100" Click="DrawSampleFigureButton_Click"/>
+            <TextBlock Margin="0,30,0,0" TextWrapping="Wrap">Instrukcja obsługi:</TextBlock>
+            <TextBlock TextWrapping="Wrap">1. Wszystko wykonujemy myszką</TextBlock>
+            <TextBlock TextWrapping="Wrap">2. Ustawienia krawędzi -> klikamy na krawędź prawym przyciskiem myszy</TextBlock>
+            <TextBlock TextWrapping="Wrap">3. Ustawienia wierzchołków -> klikamy na wierzchołek prawym przyciskiem myszy</TextBlock>
+            <TextBlock TextWrapping="Wrap">4. Niedostępne opcje nie znikają tylko nic się nie dzieje po ich naciśnięciu</TextBlock>
+            <TextBlock TextWrapping="Wrap">5. Czasem wierzchołki się przeklejają do kursora (trzeba pare razy kliknąć)</TextBlock>
         </StackPanel>
     </Grid>
 </Window>

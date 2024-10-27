@@ -12,7 +12,6 @@ namespace GK_Proj_1.Edges
 
         public override bool MoveP1To(Point pt, int edgesCount)
         {
-
             Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
             p1 = pt;
             p2 = CalculateOtherPointsPosition(p1, p2);
@@ -36,8 +35,12 @@ namespace GK_Proj_1.Edges
             bool res = false;
             Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
 
+            // Warunek gdy poprzednia krawędź nie jest pierwsza przy poprawianiu, gdy jest wertykalna wtedy:
+            // 1. jeżeli jest krótsza odległość od p2Edge.p1 do tej prostej wertykalnej niż długość odcinka tego to możemy go na 100% jakoś ustawić
+            // 2. ustawiamy go pod kątem prostym od horyzontalnej
             if (p1Edge.type == RelationType.Vertical)
             {
+                p2 = p2Edge.p1;
                 if (Math.Abs(p2.X - p1Edge.p2.X) < length)
                 {
                     if (ind != 0)
@@ -66,8 +69,13 @@ namespace GK_Proj_1.Edges
                 }
             }
 
+            // Warunek gdy poprzednia krawędź nie jest pierwsza przy poprawianiu, gdy jest horyzontalna wtedy:
+            // 1. jeżeli jest krótsza odległość od p2Edge.p1 do tej prostej hgoryzontalnej niż długość odcinka tego to możemy go na 100% jakoś ustawić
+            // 2. ustawiamy go pod kątem prostym od horyzontalnej
             if (p1Edge.type == RelationType.Horizontal)
             {
+                // potrzeba tego gdy mamy trójkąt i przesuniemy jej następce w operacji movecp1
+                p2 = p2Edge.p1;
                 if (length < Math.Abs(p2.Y - p1Edge.p2.Y))
                 {
                     if (p1.Y < p1Edge.p2.Y)
@@ -97,6 +105,8 @@ namespace GK_Proj_1.Edges
                 }
             }
 
+            // Ten warunek sprawdzamy, gdy następna krawędź jest też o stałej długości i liczymy jakby dwa koła o promieniach długości tych długości krawędzi,
+            // następnie szukamy w jakich punktach się one przecinają. Znalezione punkty są nowym drugim końcem tego odcinka i początkiem następnego.
             if (p2Edge.type == RelationType.FixedLen && ind + 1 < maxRecCount)
             {
                 double p2len = (p2Edge.p1 - p2Edge.p2).Length;
@@ -120,6 +130,7 @@ namespace GK_Proj_1.Edges
                     double ay2 = yP - (h / d) * dx;
 
                     Point r1 = new Point(ax1, ay1), r2 = new Point(ax2, ay2);
+                    // Wybieramy punkt, który jest bliżej
                     if ((p2 - r1).Length < (p2 - r2).Length)
                         p2 = r1;
                     else
@@ -162,6 +173,7 @@ namespace GK_Proj_1.Edges
 
             if (p2Edge.type == RelationType.Vertical)
             {
+                p1 = p1Edge.p2;
                 if (length > Math.Abs(p2Edge.p1.X - p1.X))
                 {
                     if (ind != 0)
@@ -195,6 +207,7 @@ namespace GK_Proj_1.Edges
 
             if (p2Edge.type == RelationType.Horizontal)
             {
+                p1 = p1Edge.p2;
                 if (length < Math.Abs(p1.Y - p2Edge.p1.Y))
                 {
                     if(ind != 0)

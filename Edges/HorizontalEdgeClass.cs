@@ -62,7 +62,7 @@ namespace GK_Proj_1.Edges
 
         public override bool MoveP1To(Point pt, int edgesCount)
         {
-            if ((pt - p2).Length <= 0.01)
+            if ((pt - p2).Length <= Var.Eps)
                 return false;
             Point oldp1 = new Point(p1.X, p1.Y), oldp2 = new Point(p2.X, p2.Y);
             p1 = pt;

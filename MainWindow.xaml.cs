@@ -197,7 +197,9 @@ namespace GK_Proj_1
             drawingFigure.AddEdgeAt(selectedEdge, hed);
             hed.vertType = ed.vertType; 
             hed.p1Edge.AdjustP2(0, drawingFigure.Edges.Count);
-            hed.p2Edge.AdjustP1(1, drawingFigure.Edges.Count);
+            hed.p2Edge.AdjustP1(0, drawingFigure.Edges.Count);
+            // Ta linie jest bez sensu, ale czasem się nie łączyło, dlatego wystarczy poruszyć krawędź o 1 i się naprawia
+            hed.p1Edge.MoveP1To(new Point(hed.p1Edge.p1.X + 1, hed.p1Edge.p1.Y), drawingFigure.Edges.Count);
             Redraw();
         }
 
@@ -211,8 +213,10 @@ namespace GK_Proj_1
             drawingFigure.Edges.RemoveAt(selectedEdge);
             drawingFigure.AddEdgeAt(selectedEdge, ved);
             ved.vertType = ed.vertType;
-            ved.p1Edge.AdjustP2(1, drawingFigure.Edges.Count);
-            ved.p2Edge.AdjustP1(1, drawingFigure.Edges.Count);
+            ved.p1Edge.AdjustP2(0, drawingFigure.Edges.Count);
+            ved.p2Edge.AdjustP1(0, drawingFigure.Edges.Count);
+            // Ta linie jest bez sensu, ale czasem się nie łączyło, dlatego wystarczy poruszyć krawędź o 1 i się naprawia
+            ved.p1Edge.MoveP1To(new Point(ved.p1Edge.p1.X + 1, ved.p1Edge.p1.Y), drawingFigure.Edges.Count);
             Redraw();
         }
 

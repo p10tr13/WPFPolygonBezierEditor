@@ -202,6 +202,41 @@ namespace GK_Proj_1.Edges
             return true;
         }
 
+        // Dodana metoda na przeciąganie tej krawędzi, aby można było ciągnąć, za niezmienioną krzywą
+        public override bool MoveEdge(double x, double y, int edgesCount)
+        {
+            if (p1Edge == null || p2Edge == null)
+                return false;
+            p1.X += x; p1.Y += y;
+            p2.X += x; p2.Y += y;
+            p1c.X += x; p1c.Y += y;
+            p2c.X += x; p2c.Y += y;
+            p1Edge.p2 = p1;
+            p2Edge.p1 = p2;
+            bool res = p1Edge.MakeCollinearToP2(0, edgesCount - 1);
+            if (!res)
+            {
+                p1.X -= x; p1.Y -= y;
+                p2.X -= x; p2.Y -= y;
+                p1c.X -= x; p1c.Y -= y;
+                p2c.X -= x; p2c.Y -= y;
+                p1Edge.p2 = p1;
+                p2Edge.p1 = p2;
+                return res;
+            }
+            res = p2Edge.MakeCollinearToP1(0, edgesCount - 1);
+            if (!res)
+            {
+                p1.X -= x; p1.Y -= y;
+                p2.X -= x; p2.Y -= y;
+                p1c.X -= x; p1c.Y -= y;
+                p2c.X -= x; p2c.Y -= y;
+                p1Edge.p2 = p1;
+                p2Edge.p1 = p2;
+            }
+            return res;
+        }
+
         // Zmieniamy miejsce punktu kontrolnego p1c
         public bool MoveCP1To(Point pt, int edgesCount)
         {
@@ -220,7 +255,7 @@ namespace GK_Proj_1.Edges
                     {
                         p1.Y = pt.Y;
                         if (vertType == VertRelationType.G1)
-                            res = p1Edge.AdjustP2(1, edgesCount);
+                            res = p1Edge.AdjustP2(0, edgesCount - 1);
                         else
                         {
                             p1Edge.p2 = p1;
@@ -228,7 +263,7 @@ namespace GK_Proj_1.Edges
                             double dy = p1.Y - pt.Y;
                             Point p1Ep1old = new Point(p1Edge.p1.X, p1Edge.p1.Y);
                             p1Edge.p1 = new Point(pt.X + 4 * dx,pt.Y + 4 * dy);
-                            res = p1Edge.p1Edge.AdjustP2(2, edgesCount);
+                            res = p1Edge.p1Edge.AdjustP2(0, edgesCount - 2);
                             if (!res) p1Edge.p1 = p1Ep1old;
                         }
                         break;
@@ -237,14 +272,14 @@ namespace GK_Proj_1.Edges
                     {
                         p1.X = pt.X;
                         if (vertType == VertRelationType.G1)
-                            res = p1Edge.AdjustP2(1, edgesCount);
+                            res = p1Edge.AdjustP2(0, edgesCount - 1);
                         else
                         {
                             p1Edge.p2 = p1;
                             double dx = p1.X - pt.X;
                             double dy = p1.Y - pt.Y;
                             p1Edge.p1 = new Point(pt.X + 4 * dx, pt.Y + 4 * dy);
-                            res = p1Edge.p1Edge.AdjustP2(2, edgesCount);
+                            res = p1Edge.p1Edge.AdjustP2(0, edgesCount - 2);
                         }
                         break;
                     }
@@ -277,7 +312,7 @@ namespace GK_Proj_1.Edges
                             double dy = p1.Y - pt.Y;
                             Point p1Ep1old = new Point(p1Edge.p1.X, p1Edge.p1.Y);
                             p1Edge.p1 = new Point(pt.X + 4 * dx, pt.Y + 4 * dy);
-                            res = p1Edge.p1Edge.AdjustP2(2, edgesCount);
+                            res = p1Edge.p1Edge.AdjustP2(0, edgesCount - 2);
                             if(!res) p1Edge.p1 = p1Ep1old;
                         }
                         break;
@@ -308,7 +343,7 @@ namespace GK_Proj_1.Edges
                     {
                         p2.Y = pt.Y;
                         if (p2Edge.vertType == VertRelationType.G1)
-                            res = p2Edge.AdjustP1(1, edgesCount);
+                            res = p2Edge.AdjustP1(0, edgesCount - 1);
                         else
                         {
                             p2Edge.p1 = p2;
@@ -316,7 +351,7 @@ namespace GK_Proj_1.Edges
                             double dy = p2.Y - pt.Y;
                             Point p2Ep2old = new Point(p2Edge.p2.X, p2Edge.p2.Y);
                             p2Edge.p2 = new Point(pt.X + 4 * dx, pt.Y + 4 * dy);
-                            res = p2Edge.p2Edge.AdjustP1(2, edgesCount);
+                            res = p2Edge.p2Edge.AdjustP1(0, edgesCount - 2);
                             if (!res) p2Edge.p2 = p2Ep2old;
                         }
                         break;
@@ -325,7 +360,7 @@ namespace GK_Proj_1.Edges
                     {
                         p2.X = pt.X;
                         if (p2Edge.vertType == VertRelationType.G1)
-                            res = p2Edge.AdjustP1(1, edgesCount);
+                            res = p2Edge.AdjustP1(0, edgesCount - 1);
                         else
                         {
                             p2Edge.p1 = p2;
@@ -333,7 +368,7 @@ namespace GK_Proj_1.Edges
                             double dy = p2.Y - pt.Y;
                             Point p2Ep2old = new Point(p2Edge.p2.X, p2Edge.p2.Y);
                             p2Edge.p2 = new Point(pt.X + 4 * dx, pt.Y + 4 * dy);
-                            res = p2Edge.p2Edge.AdjustP1(2, edgesCount);
+                            res = p2Edge.p2Edge.AdjustP1(0, edgesCount - 2);
                             if (!res) p2Edge.p2 = p2Ep2old;
                         }
                         break;
