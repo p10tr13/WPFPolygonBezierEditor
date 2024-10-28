@@ -8,6 +8,7 @@ namespace GK_Proj_1.Edges
     {
         public HorizontalEdge(Point p1, Point p2) : base(p1, new Point(p2.X, p1.Y)) { type = RelationType.Horizontal; }
 
+        // Staramy się nie zmieniać X drugiego wierzchołka tego odcinka
         public override bool AdjustP1(int ind, int maxRecCount)
         {
             if (p1Edge == null || p2Edge == null)

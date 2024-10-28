@@ -76,6 +76,7 @@ namespace GK_Proj_1.Edges
         }
 
         // Dopasowanie pozycji wierzchołka p1 do p1Edge.p2
+        //-----------Wszystkie funkcje z dopiskiem P2 zamiast P1 są symetryczne------------
         public virtual bool AdjustP1(int ind, int maxRecCount)
         {
             if (p1Edge == null || p2Edge == null)
