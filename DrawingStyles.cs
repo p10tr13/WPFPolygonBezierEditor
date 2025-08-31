@@ -1,13 +1,13 @@
 ﻿namespace GK_Proj_1
 {
-    // Sposób rysowania krawędzi
+    // Style of drawing lines
     public enum DrawingStyle
     {
         Windows,
         Bresenham
     }
 
-    // Sposób rysowania krawędzi Beziera
+    // Style of drawing Bezier curves
     public enum BezierDrawingStyle
     {
         Easy,

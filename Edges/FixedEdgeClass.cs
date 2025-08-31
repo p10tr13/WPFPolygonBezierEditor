@@ -289,7 +289,7 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
-        // Dopasowywujemy pozycję p2, tak aby był w odpowiedniej odległosci od p1 i ją zwracamy
+        // Adjusts the position of p2 so that it is at the correct distance from p1 and return it.
         private Point CalculateOtherPointsPosition(Point p1, Point p2)
         {
             Point res = new Point();

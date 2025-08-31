@@ -51,7 +51,7 @@ namespace GK_Proj_1
             e3.AdjustCP2(0, 0);
         }
 
-        // Sprawdzamy czy dany punkt jest blisko któregoś wierzchołka (numeracja po pierwszych wierzchołkach listy krawędzi)
+        // Checks whether a given point is close to one of the vertices.
         public bool IsNearVert(Point pt, out int ind)
         {
             for (int i = 0; i < Edges.Count; i++)
@@ -66,7 +66,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        // Sprawdzamy czy dany punkt leży blisko punktów kontrolnych
+        // Checks whether a given point is close to control points.
         public bool IsNearControlPoint(Point pt, out int indv, out int indc)
         {
             for (int i = 0; i < Edges.Count; i++)
@@ -82,7 +82,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        // Sprawdzamy czy dany punkt jest blisko którejś krawędzi
+        // Checks whether a given point is close to one of the edges.
         public bool IsNearEdge(Point pt, out int ind)
         {
             for (int i = 0; i < Edges.Count; i++)
@@ -97,7 +97,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        // Sprawdzamy czy punkt jest w środku wielokąta(nie uwzględnia krzywych beziera)
+        // Checks whether the point is inside the polygon (excluding Bezier curves).
         public bool IsPointInside(Point pt)
         {
             double x = pt.X, y = pt.Y;
@@ -135,7 +135,7 @@ namespace GK_Proj_1
             return inside;
         }
 
-        // Przesuwamy figurę niezależnie od tego, czy będzie na ekranie czy nie
+        // Moves the figure regardless of whether it will be on the screen or not.
         public void SimpleMove(double x, double y)
         {
             foreach (Edge ed in Edges)
@@ -155,7 +155,7 @@ namespace GK_Proj_1
             }
         }
 
-        // Aktualizujemy w każdej krawędzi referencje do p1Edge i p2Edge
+        // Updates references to p1Edge and p2Edge for every edge.
         public void UpdateAllRelations()
         {
             int p = Edges.Count - 1, n = 1;
@@ -168,7 +168,7 @@ namespace GK_Proj_1
             }
         }
 
-        // Aktualizujemy w danej krawędzi referencje do p1Edge i p2Edge
+        // Updates references to p1Edge and p2Edge in a given edge.
         public void UpdateRelation(int ind)
         {
             Edge edge = Edges[ind];
@@ -194,7 +194,7 @@ namespace GK_Proj_1
             edge.p2Edge = Edges[ind + 1];
         }
 
-        // Próbujemy przesunąć wierzchołek o indeksie vertind do punktu pt 
+        // Tries to move the vertex with index vertind to point pt.
         public bool TryMoveVert(Point pt, int vertind)  
         {
             if(Edges[vertind].MoveP1To(pt,Edges.Count))
@@ -203,7 +203,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        // Próbujemy przesunąć punkt kontrolny
+        // Tries to move control point.
         public bool TryMoveControlPoint(Point pt, int vertind, int controlptind) 
         {
             if(Edges[vertind].MoveCPTo(pt, controlptind, Edges.Count))
@@ -220,7 +220,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        // Próbujemy przesunąć całą krawędź
+        // Tries to move the whole edge.
         public bool TryMoveEdge(double x, double y, int edgeind)
         {
             if (Edges[edgeind].MoveEdge(x, y, Edges.Count - 1))
@@ -229,7 +229,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        // Sprawdzamy, czy możemy usunąć/dodać krawędź o danym typie
+        // Checks whether we can remove/add an edge of a given type.
         public bool CheckRelationsOfEdge(int ind, RelationType type)
         {
             int p = ind - 1, n = (ind + 1) % Edges.Count;
@@ -238,7 +238,7 @@ namespace GK_Proj_1
             return (type == RelationType.Regular || type == RelationType.FixedLen || type == RelationType.Bezier || (Edges[n].type != type && type != Edges[p].type));
         }
 
-        // Przy zmianie typu wierzchołka korygujemy figure
+        // When changing the vertex type, method corrects the figure.
         public void AdjustFigureToVertRelation(int vertind)
         {
             if (Edges[vertind].type == RelationType.Bezier)

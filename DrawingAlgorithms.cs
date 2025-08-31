@@ -5,7 +5,7 @@ namespace GK_Proj_1
 {
     public static class DrawingAlgorithms
     {
-        // Algorytm Bresenhama - zwracamy tutaj listę piskelów do pokolorwania
+        // Algorytm Bresenhama - retunrs list of pixels to color
         public static List<(int x,int y)> BresenhamLine(int x1,int y1,int x2, int y2)
         {
             List<(int x, int y)> res = new List<(int x, int y)> ();
@@ -82,7 +82,7 @@ namespace GK_Proj_1
             return res;
         }
 
-        // Rysujemy linię zwróconą z algorytmu Bresenhama
+        // Draws a line from list of points returned by Bresenham's algorithm
         public static void DrawBresenhamLine(Point p1, Point p2, DrawingContext dc)
         {
             List<(int x, int y)> pixels = BresenhamLine((int)p1.X, (int)p1.Y, (int)p2.X, (int)p2.Y);
@@ -92,9 +92,8 @@ namespace GK_Proj_1
             }
         }
 
-        // Rysujemy krzywą Beziera 3 stopnia
-        // punkty są tutaj nazywane zgodnie z literaturą nie z resztą programu
-        // p0 - p3 to odpowiednio początki o końce krzywej Beziera
+        // Draws cubic Bezier curve
+        // The points are named here according to the literature, not the rest of the program.
         public static List<(int x, int y)> DrawBezierCurve(Point p0, Point p1, Point p2, Point p3, DrawingContext dc)
         {
             List<(int x, int y)> pixels = BezierCubicLine((int)p0.X, (int)p0.Y,(int)p1.X, (int)p1.Y, (int)p2.X, (int)p2.Y, (int)p3.X, (int)p3.Y);
@@ -105,8 +104,6 @@ namespace GK_Proj_1
             return pixels;
         }
 
-        // Algorytm rysowania krzywej Beziera z wykładu w kodzie ustawiony jest na 10 punktów, aby było widać różnicę dla innego
-        // przedstawionego sposobu rysowania
         public static List<(int x, int y)> DrawBezierCurve(Point p0, Point p1, Point p2, Point p3, DrawingContext dc, int dots)
         {
             List<(int x, int y)> points = new List<(int x, int y)>();

@@ -22,28 +22,28 @@ namespace GK_Proj_1
             Var.BezierDrawingStyle = BezierDrawingStyle.Rasterisation;
         }
 
-        // Zmienne
+        // Variables
 
         private ContextMenu vertContextMenu, edgeContextMenu;
-        private bool drawing = false; // Czy teraz rysujemy?
-        private Figure drawingFigure = new Figure(); // Nasza figura
-        private Edge drawingAnimationEdge = null; // Krawędź, która podąża za kursorem przy rysowaniu
+        private bool drawing = false;
+        private Figure drawingFigure = new Figure();
+        private Edge drawingAnimationEdge = null; // An edge that follows the cursor when drawing.
 
-        // Zmienne, który element miał na myśli użytkownik klikający ekran
+        // Variables that indicate which element user clicking the screen had in mind.
         private int selectedVert = -1;
         private int selectedCVert = -1;
         private int selectedEdge = -1;
 
-        // Zmienne do przeciągania elementów
+        // Variables used when dragging elements.
         private bool draggingFigure = false;
         private bool draggingVert = false;
         private bool draggingEdge = false;
         private bool draggingCVert = false;
 
-        private Point addVertPoint = new Point(0, 0); // Punkt kliknięcia myszy, przy dodawaniu wierzchołka do krawędzi
-        private Point lastMousePosition = new Point(0, 0); // Ostatnia pozycja myszki przy ruszaniu po Canva
+        private Point addVertPoint = new Point(0, 0); // Mouse press point when adding a vertex to an edge.
+        private Point lastMousePosition = new Point(0, 0); // Last mouse position when moving around Canva.
 
-        // Tworzenie menu contextowego dla kliknięcia wierchołka
+        // Creating a context menu for clicking on the vertex
         private void InitializeVertContextMenu()
         {
             vertContextMenu = new ContextMenu();
@@ -65,7 +65,7 @@ namespace GK_Proj_1
             vertContextMenu.Items.Add(c1MenuItem);
         }
 
-        // Tworzenie menu contextowego dla kliknięcia krawędzi
+        // Creating a context menu for clicking on the edge
         private void InitializeEdgeContextMenu()
         {
             edgeContextMenu = new ContextMenu();
@@ -95,7 +95,7 @@ namespace GK_Proj_1
             deleteRelMenuItem.Click += DeleteRelItemClick;
         }
 
-        // Usuwanie wierzchołka
+        // Delets vertex
         private void DeleteMenuItemClick(object sender, RoutedEventArgs e)
         {
             if (drawingFigure.Edges.Count == 3)
@@ -127,7 +127,7 @@ namespace GK_Proj_1
             return;
         }
 
-        // Zmiana rodzaju wierzchołka na G0
+        // Changes vertex type to G0
         private void G0MenuItemClick(object sender, EventArgs e)
         {
             drawingFigure.Edges[selectedVert].vertType = VertRelationType.G0;
@@ -135,7 +135,7 @@ namespace GK_Proj_1
             return;
         }
 
-        // Zmiana rodzaju wierzchołka na G1, tylko gdy jest przy Bezierze
+        // Changes vertex type to G1 (only when adjecent to Bezier)
         private void G1MenuItemClick(object sender, EventArgs e)
         {
             if (drawingFigure.Edges[selectedVert].vertType == VertRelationType.G1)
@@ -155,7 +155,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
-        // Zmiana rodzaju wierzchołka na C1, tylko gdy jest przy Bezierze
+        // Changes vertex type to C1 (only when adjecent to Bezier)
         private void C1MenuItemClick(object sender, EventArgs e)
         {
             if (drawingFigure.Edges[selectedVert].vertType == VertRelationType.C1)
@@ -175,7 +175,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
-        // Dodanie nowego wierzchołka
+        // Add new vertex.
         private void AddVertexItemClick(object sender, RoutedEventArgs e)
         {
             Point p1 = drawingFigure.Edges[selectedEdge].p1, p2 = drawingFigure.Edges[selectedEdge].p2;
@@ -186,7 +186,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
-        // Zmiana krawędzi na poziomą
+        // Changes the edge to horizontal.
         private void HorEdgeItemClick(object sender, RoutedEventArgs e)
         {
             if (!drawingFigure.CheckRelationsOfEdge(selectedEdge, RelationType.Horizontal))
@@ -203,7 +203,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
-        // Zmiana krawędzi na pionową
+        // Changes the edge to vertical.
         private void VerEdgeItemClick(object sender, RoutedEventArgs e)
         {
             if (!drawingFigure.CheckRelationsOfEdge(selectedEdge, RelationType.Vertical))
@@ -220,7 +220,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
-        // Zmiana krawędzi na taką z ustaloną długością (zablokowanie długości krawędzi)
+        // Changing the edge to one with a fixed length.
         private void FixEdgeItemClick(object sender, RoutedEventArgs e)
         {
             Edge ed = drawingFigure.Edges[selectedEdge];
@@ -258,7 +258,7 @@ namespace GK_Proj_1
             }
         }
 
-        // Zmiana krawędzi na krzywą Beziera 3 stopnia
+        // Changing edges to a 3rd degree Bézier curve.
         private void BezEdgeItemClick(object sender, RoutedEventArgs e)
         {
             Edge ed = drawingFigure.Edges[selectedEdge];
@@ -274,7 +274,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
-        // Usunięcie jakiegoś ograniczenia/rodzaj krawędzi jeśli istnieje
+        // Removing a constraint or edge type if it exists.
         private void DeleteRelItemClick(object sender, RoutedEventArgs e)
         {
             if (drawingFigure.Edges[selectedEdge].type == RelationType.Regular)
@@ -288,7 +288,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
-        // Zmiana trybu rysowania na "mój"
+        // Changes the drawing mode to the one implemented by author.
         private void BresenhamRadioButtonChecked(object sender, RoutedEventArgs e)
         {
             Var.DrawingStyle = DrawingStyle.Bresenham;
@@ -297,7 +297,7 @@ namespace GK_Proj_1
                 windowsRadioButton.IsChecked = false;
         }
 
-        // Zmiana trybu rysowania na windowsowy
+        // Changing the line drawing mode to Windows mode.
         private void WindowsRadioButtonChecked(object sender, RoutedEventArgs e)
         {
             Var.DrawingStyle = DrawingStyle.Windows;
@@ -305,7 +305,7 @@ namespace GK_Proj_1
                 bresenhanRadioButton.IsChecked = false;
         }
 
-        // Ruch myszką na Canva
+        // Mouse movement on Canva.
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
             Point pt = e.GetPosition(Canva);
@@ -349,7 +349,7 @@ namespace GK_Proj_1
 
         }
 
-        // Sprawdzamy, czy mamy zacząć przeciągać jakiś element lub rysować nową krawędź
+        // Checks whether should start dragging an element or drawing a new edge.
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point pt = e.GetPosition(Canva);
@@ -415,7 +415,7 @@ namespace GK_Proj_1
             }
         }
 
-        // Otworzenie menu contextowego, jeżeli blisko jakiegoś elementu
+        // Opens the context menu if close to an element.
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point pt = e.GetPosition(Canva);
@@ -438,7 +438,7 @@ namespace GK_Proj_1
             }
         }
 
-        // Puszczenie lewego klawisza myszy = kończenie przeciągania jekiegoś elementu
+        // Releasing the left mouse button = ending the dragging of an element.
         private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             draggingFigure = false;
@@ -469,7 +469,7 @@ namespace GK_Proj_1
             Redraw();
         }
 
-        // Wyczyszczenie Canva i narysowanie wielokąta
+        // Clearing Canva and drawing a polygon.
         private void Redraw()
         {
             Canva.Children.Clear();

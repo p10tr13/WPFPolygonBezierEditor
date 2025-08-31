@@ -6,10 +6,10 @@ namespace GK_Proj_1.Edges
 {
     public class Edge
     {
-        public RelationType type { get; set; } // Typ tej krawędzi
-        public VertRelationType vertType { get; set; } // Typ wierzchołka p1
-        public Edge? p1Edge, p2Edge; // Krawędzie sąsiadujące (np. p1Edge - krawędź sąsiadująca zz wierzchołkiem p1)
-        public Point p1, p2; // Wierzchołki krawędzi
+        public RelationType type { get; set; } // Type of this edge
+        public VertRelationType vertType { get; set; } // Type of p1 vertex
+        public Edge? p1Edge, p2Edge; // Adjacent edges (e.g. p1Edge - the edge adjacent to vertex p1)
+        public Point p1, p2; // Edge vertices
 
         public Edge(Point pnt1, Point pnt2)
         {
@@ -19,7 +19,7 @@ namespace GK_Proj_1.Edges
             vertType = VertRelationType.G0;
         }
 
-        // Rysowanie krawędzi i kropki wierzchołka p1
+        // Drawing the edges and the vertex dot p1.
         public virtual void Draw(DrawingContext dc)
         {
             switch(Var.DrawingStyle)
@@ -39,7 +39,7 @@ namespace GK_Proj_1.Edges
             dc.DrawEllipse(Var.VertColor, null, p1, Var.VertSize, Var.VertSize);
         }
 
-        // Sprawdzamy, czy punkt kliknięcia jest blisko p1
+        // Checks if the pressed point is close to p1.
         public bool IsNearP1Vert(Point pt)
         {
             if ((p1 - pt).Length < 10)
@@ -49,7 +49,7 @@ namespace GK_Proj_1.Edges
             return false;
         }
 
-        // Sprawdzamy, czy punkt kliknięcia jest blisko p2
+        // Checks if the pressed point is close to p2.
         public bool IsNearP2Vert(Point pt)
         {
             if ((p2 - pt).Length < 10)
@@ -59,7 +59,7 @@ namespace GK_Proj_1.Edges
             return false;
         }
 
-        // Sprawdzamy, czy punkt kliknięcia jest blisko krawędzi
+        // Checks if the pressed point is close to the edge.
         public virtual bool IsNearEdge(Point pt)
         {
             Point closestpt = Geometry.ClosestPointOnEdge(pt, p1, p2);
@@ -68,15 +68,15 @@ namespace GK_Proj_1.Edges
             return (closestpt - pt).Length < 10;
         }
 
-        // Sprawdzamy, czy dany punkt jest blisko punktu kontrolnego
+        // Checks whether a given point is close to a control point.
         public virtual bool IsNearControlPoint(Point pt, out int indc)
         {
             indc = -1;
             return false;
         }
 
-        // Dopasowanie pozycji wierzchołka p1 do p1Edge.p2
-        //-----------Wszystkie funkcje z dopiskiem P2 zamiast P1 są symetryczne------------
+        // Aligning the position of vertex p1 to p1Edge.p2
+        //-----------All functions with P2 instead of P1 are symmetric.------------
         public virtual bool AdjustP1(int ind, int maxRecCount)
         {
             if (p1Edge == null || p2Edge == null)
@@ -87,7 +87,7 @@ namespace GK_Proj_1.Edges
             return true;
         }
 
-        // Dopasowanie pozycji wierzchołka p2 do p2Edge.p1
+        // Aligning the position of vertex p2 to p2Edge.p1.
         public virtual bool AdjustP2(int ind, int maxRecCount)
         {
             if (p2Edge == null || p1Edge == null)
@@ -98,7 +98,7 @@ namespace GK_Proj_1.Edges
             return true;
         }
 
-        // Przesunięcie wierzchołka p1 w dane miejsce, a następnie dopasowanie krawędzi z nim sąsiadującą
+        // Move vertex p1 to a specific location, then adjust the adjacent edge.
         public virtual bool MoveP1To(Point pt, int edgesCount)
         {
             if (p1Edge == null || p2Edge == null)
@@ -109,13 +109,13 @@ namespace GK_Proj_1.Edges
             return p1Edge.AdjustP2(0, edgesCount);
         }
 
-        // Funkcja przesuwa punkt kontrolny, jeżeli taki przy krawędzi jest
+        // The function moves the control point if there is one at the edge.
         public virtual bool MoveCPTo(Point pt, int cpind, int edgesCount)
         {
             return false;
         }
 
-        // Przesuwamy całą krawędź i "doczepiamy" do niej krawędzie odczepiuone przy przesunięciu
+        // Moves the entire edge and “attaches” the edges that were detached during the movement to it.
         public virtual bool MoveEdge(double x, double y, int edgesCount)
         {
             if(p1Edge == null || p2Edge == null)
@@ -144,14 +144,14 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
-        // Dopasowywuje położenie punktu kontrolnego przy wierzchołku p1, jeżeli jest taka potrzeba
+        // Adjusts the position of the control point at vertex p1, if necessary.
         public virtual void AdjustCP1(double dx, double dy) {}
 
-        // Dopasowywuje położenie punktu kontrolnego przy wierzchołku p2, jeżeli jest taka potrzeba 
+        // Adjusts the position of the control point at vertex p2, if necessary.
         public virtual void AdjustCP2(double dx, double dy) {}
 
-        // Funckja ustawia krawędź, aby była współliniowa do p1 i jego punktu kontrolnego,
-        // następnie dołącza do nowej pozycji następną krawędź
+        // The function sets the edge to be collinear with p1 and its control point,
+        // then attaches the next edge to the new position.
         public virtual bool MakeCollinearToP1(int ind, int edgesCount)
         {
             bool res = false;
@@ -233,8 +233,8 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
-        // Funckja ustawia krawędź, aby była współliniowa do p2 i jego punktu kontrolnego,
-        // następnie dołącza do nowej pozycji następną krawędź
+        // The function sets the edge to be collinear with p2 and its control point,
+        // then attaches the next edge to the new position.
         public virtual bool MakeCollinearToP2(int ind, int edgesCount)
         {
             bool res = false;
@@ -316,8 +316,7 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
-        // Podajemy z którym wierzchołkiem jest połączony bezpośrednio ten wierzchołek i zwraca
-        // punkty, z którymi powinniśmy ustalić współliniowość
+        // For specified vertex returns the points with which should be established collinearity.
         public virtual (Point p1,  Point p2) GetCollinearPoints(int vert)
         {
             if(vert == 2)

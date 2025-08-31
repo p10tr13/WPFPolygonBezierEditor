@@ -13,7 +13,7 @@ namespace GK_Proj_1
             return false;
         }
 
-        // Skręt w lewo/prawo/prosto
+        // Returns the orientation of the ordered triplet (p, q, r).
         public static int Orientation(Point p, Point q, Point r)
         {
             double val = (q.Y - p.Y) * (r.X - q.X) -
@@ -24,7 +24,7 @@ namespace GK_Proj_1
             return (val > 0) ? 1 : 2; 
         }
 
-        // Czy dwa dane odcinki się przecinają?
+        // Returns true if line segments 'p1q1' and 'p2q2' intersect.
         public static bool Intersect(Point p1, Point q1, Point p2, Point q2)
         {
 
@@ -47,13 +47,13 @@ namespace GK_Proj_1
             return false;
         }
 
-        // Czy trzy punkty są współliniowe?
+        // Returns true if the points are collinear.
         public static bool IsCollinear(Point x1, Point x2, Point x3)
         {
             return Math.Abs((x2.X - x1.X) * (x3.Y - x1.Y) - (x2.Y - x1.Y) * (x3.X - x1.X)) < Var.Eps;
         }
 
-        // Zwraca punkt najbliższy punktowi , aby był współliniowy z  i  
+        // Returns a point on the line defined by x1 and x2 that is closest to x3  
         public static Point MovePointToBeCollinear(Point x1, Point x2, Point x3)
         {
             double dx = x2.X - x1.X;
@@ -64,7 +64,7 @@ namespace GK_Proj_1
             return new Point(x1.X + dx * t, x1.Y + dy * t);
         }
 
-        // Zwraca środek pomiędzy dwoma punktami
+        // Returns the middle point between p1 and p2
         public static Point GetMiddle(Point p1, Point p2)
         {
             Point middle = new Point();
@@ -82,7 +82,7 @@ namespace GK_Proj_1
             return middle;
         }
 
-        // Znajduje punkt przecięcia dwóch prostych na przechodzących przez punkty p1-p2 oraz p3-p4
+        // Returns the intersection point of lines p1p2 and p3p4 or (-1,-1) if they are parallel
         public static Point FindIntersection(Point p1, Point p2, Point p3, Point p4)
         {
             if (Math.Abs(p2.X - p1.X) < Var.Eps || Math.Abs(p4.X - p3.X) < Var.Eps)
@@ -110,7 +110,7 @@ namespace GK_Proj_1
             return new Point(x, y);
         }
 
-        // Znajduje punkt naleźący do odcinka p1-p2, który jest najbliższy pt
+        // Returns the closest point on the edge p1p2 to the point pt
         public static Point ClosestPointOnEdge(Point pt, Point p1, Point p2)
         {
             double LLS = Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2);
@@ -123,7 +123,7 @@ namespace GK_Proj_1
             return new Point(closeX, closeY);
         }
 
-        // Sprawdza czy współliniowe punkty p1,p2,p3 mają p1 i p3 po przeciwnej stronie od p2
+        // Returns true if p1 and p3 are on the same side of point p2
         public static bool OnTheSameSideofP2(Point p1, Point p2, Point p3)
         {
             return ((p2.X - p1.X) * (p3.X - p2.X) + (p2.Y - p1.Y) * (p3.Y - p2.Y)) < 0;

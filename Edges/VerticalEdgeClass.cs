@@ -8,7 +8,7 @@ namespace GK_Proj_1.Edges
     {
         public VerticalEdge(Point p1, Point p2) : base(p1, new Point(p1.X, p2.Y)) { type = RelationType.Vertical; }
 
-        // Staramy się nie zmieniać Y drugiego wierzchołka tego odcinka
+        // Tries not to change the Y of the second vertex of this edge.
         public override bool AdjustP1(int ind, int maxRecCount)
         {
             if (p1Edge == null)

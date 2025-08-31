@@ -6,9 +6,9 @@ namespace GK_Proj_1.Edges
 {
     public class BezierEdge : Edge
     {
-        public Point p1c, p2c; // Punkty kontrolne
+        public Point p1c, p2c; // Control points
 
-        private List<(int x, int y)> pixels; // Lista pikseli, w których rysujemy krzywą
+        private List<(int x, int y)> pixels; // Pixels of the drawn bezier curve
 
         public BezierEdge(Point pnt1, Point pnt2) : base(pnt1, pnt2)
         {
@@ -51,7 +51,7 @@ namespace GK_Proj_1.Edges
                 return (p2c, p2);
         }
 
-        // Funkcja wypisuje odpowiednie G0/G1/C1 przy wierzchołku
+        // The function prints the appropriate G0/G1/C1 close to the vertex.
         public void DrawG(DrawingContext dc)
         {
             string s1, s2;
@@ -86,7 +86,7 @@ namespace GK_Proj_1.Edges
             }
         }
 
-        // Zwracamy czy punkt jest bliskoo punktu kontrolnego oraz informację którego
+        // Checks whether the point is close to the control point and the information which one.
         public override bool IsNearControlPoint(Point pt, out int indc)
         {
             if ((p1c - pt).Length < 10)
@@ -103,7 +103,7 @@ namespace GK_Proj_1.Edges
             return false;
         }
 
-        // Przesuwamy punkt kontrolny o danym indeksie do pt
+        // Moves the control point with a given index to pt.
         public override bool MoveCPTo(Point pt, int cpind, int edgesCount)
         {
             if (cpind == 1)
@@ -202,7 +202,6 @@ namespace GK_Proj_1.Edges
             return true;
         }
 
-        // Dodana metoda na przeciąganie tej krawędzi, aby można było ciągnąć, za niezmienioną krzywą
         public override bool MoveEdge(double x, double y, int edgesCount)
         {
             if (p1Edge == null || p2Edge == null)
@@ -237,7 +236,7 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
-        // Zmieniamy miejsce punktu kontrolnego p1c
+        // Changes the location of control point p1c
         public bool MoveCP1To(Point pt, int edgesCount)
         {
             Point p1cold = p1c;
@@ -325,7 +324,7 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
-        // Zmieniamy miejsce punktu kontrolnego p2c
+        // Changes the location of control point p2c
         public bool MoveCP2To(Point pt, int edgesCount)
         {
             Point p2cold = p2c;
@@ -416,8 +415,8 @@ namespace GK_Proj_1.Edges
             return res;
         }
 
-        // Sprawdzam piksele, czy punkt liknięty na ekranie jest blisko piksela,
-        // a nie punktu pomiędzy wierzchołkami p1 i p2
+        // Checks the pixels to see if the point pressed on the screen is close to a pixel,
+        // rather than a point between vertices p1 and p2.
         public override bool IsNearEdge(Point pt)
         {
             foreach ((int x, int y) in pixels)
