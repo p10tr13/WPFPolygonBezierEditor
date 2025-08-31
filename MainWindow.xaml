@@ -5,30 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GK_Proj_1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1200" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="Polygon Bezier Editor" Height="700" Width="1200" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1000"/>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="185"/>
         </Grid.ColumnDefinitions>
         <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="3" Margin="5">
         <Canvas x:Name="Canva" Background="White" MouseLeftButtonUp="Canvas_MouseLeftButtonUp"  MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="Canvas_MouseMove" MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
         </Border>
         <StackPanel Grid.Column="1">
-            <TextBlock>Sposób rysowania krawędzi:</TextBlock>
+            <TextBlock>Edge drawing method:</TextBlock>
             <RadioButton x:Name="windowsRadioButton" IsChecked="True" Checked="WindowsRadioButtonChecked" GroupName="GrupaA">Windows</RadioButton>
             <RadioButton x:Name="bresenhanRadioButton" Checked="BresenhamRadioButtonChecked" IsChecked="False" GroupName="GrupaA">Bresenham</RadioButton>
-            <TextBlock>Sposób rysowania Beziera:</TextBlock>
+            <TextBlock>Bezier edge drawing method:</TextBlock>
             <RadioButton x:Name="rasterisationRadioButton" IsChecked="True" Checked="RasterisationRadioButtonChecked" GroupName="GrupaB">Rasterisation</RadioButton>
-            <RadioButton x:Name="easyRadioButton" Checked="EasyRadioButtonChecked" IsChecked="False" GroupName="GrupaB">Wzór z wykładu</RadioButton>
-            <TextBlock>Przykładowy wielokąt:</TextBlock>
-            <Button x:Name="DrawSampleFigureButton" HorizontalAlignment="Left" Content="Narysuj" Margin="5" Width="100" Click="DrawSampleFigureButton_Click"/>
-            <TextBlock Margin="0,30,0,0" TextWrapping="Wrap">Instrukcja obsługi:</TextBlock>
-            <TextBlock TextWrapping="Wrap">1. Wszystko wykonujemy myszką</TextBlock>
-            <TextBlock TextWrapping="Wrap">2. Ustawienia krawędzi -> klikamy na krawędź prawym przyciskiem myszy</TextBlock>
-            <TextBlock TextWrapping="Wrap">3. Ustawienia wierzchołków -> klikamy na wierzchołek prawym przyciskiem myszy</TextBlock>
-            <TextBlock TextWrapping="Wrap">4. Niedostępne opcje nie znikają tylko nic się nie dzieje po ich naciśnięciu</TextBlock>
-            <TextBlock TextWrapping="Wrap">5. Czasem wierzchołki się przeklejają do kursora (trzeba pare razy kliknąć)</TextBlock>
+            <RadioButton x:Name="easyRadioButton" Checked="EasyRadioButtonChecked" IsChecked="False" GroupName="GrupaB">Simple drawing method</RadioButton>
+            <TextBlock>Sample polygon:</TextBlock>
+            <Button x:Name="DrawSampleFigureButton" HorizontalAlignment="Left" Content="Draw" Margin="5" Width="100" Click="DrawSampleFigureButton_Click"/>
+            <TextBlock Margin="0,30,0,0" TextWrapping="Wrap">Manual:</TextBlock>
+            <TextBlock TextWrapping="Wrap">1. Program is operated 100% by mouse.</TextBlock>
+            <TextBlock TextWrapping="Wrap">2. To enter edge settings press right mouse button on the desired edge.</TextBlock>
+            <TextBlock TextWrapping="Wrap">3. To enter vertex settings press right mouse button on the desired vertex.</TextBlock>
+            <TextBlock TextWrapping="Wrap">4. Not available options don't disappear, but nothing happens after pressing them.</TextBlock>
         </StackPanel>
     </Grid>
 </Window>
