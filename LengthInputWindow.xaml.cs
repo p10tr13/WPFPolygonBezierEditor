@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 namespace GK_Proj_1
 {
     /// <summary>
-    /// Logika interakcji dla klasy LengthInputWindow.xaml
+    /// Interaction logic for LengthInputWindow.xaml
     /// </summary>
     public partial class LengthInputWindow : Window
     {
@@ -33,7 +33,7 @@ namespace GK_Proj_1
             {
                 if (newLength <= 0)
                 {
-                    MessageBox.Show("Wprowadź poprawną liczbę", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Enter the correct number", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
                 Lenght = newLength;
@@ -41,7 +41,7 @@ namespace GK_Proj_1
             }
             else
             {
-                MessageBox.Show("Wprowadź poprawną liczbę", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Enter the correct number", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
